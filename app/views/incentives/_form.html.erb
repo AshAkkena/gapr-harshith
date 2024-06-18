@@ -1,0 +1,27 @@
+<%= form_with(model: incentive) do |form| %>
+  <% if incentive.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(incentive.errors.count, "error") %> prohibited this incentive from being saved:</h2>
+
+      <ul>
+        <% incentive.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :fingerprint %>
+    <%= form.text_field :fingerprint %>
+  </div>
+
+  <div class="field">
+    <%= form.label :period %>
+    <%= form.text_field :period %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

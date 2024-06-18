@@ -1,0 +1,281 @@
+<p>A provider is an organization or agency that provides core PREP programming directly to youth.</p>
+
+<%= form_with(model: provider) do |form| %>
+  <% if provider.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(provider.errors.count, "error") %> prohibited this provider from being saved:</h2>
+
+      <ul>
+        <% provider.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <h2>Basics</h2>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <% if current_user.has_role?(:technician) %>
+        <div class="field">
+          <%= form.label :period %>
+          <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year, disabled: true %>
+        </div>
+      <% end %>
+      <div class="field">
+        <%= form.label :long_name %>
+        <%= form.text_field :long_name, required: true, disabled: true %>
+      </div>
+      <% if current_user.has_role?(:technician) %>
+        <div class="field">
+          <%= form.label :pmms_aggregate_name %>
+          <%= form.text_field :pmms_aggregate_name, required: true, disabled: true %>
+        </div>
+        <div class="field">
+          <%= form.label :can_pool %>
+          <%= form.check_box :can_pool, disabled: true %>
+        </div>
+        <div class="field">
+          <%= form.label :is_test %>
+          <%= form.check_box :is_test, disabled: true %>
+        </div>
+      <% end %>
+      <p>Indicate whether the provider first received PREP funding during the reporting period.</p>
+      <div class="field">
+        <%= form.label :provider_new %>
+        <%= form.check_box :provider_new, disabled: true %>
+      </div>
+      <p>Indicate whether the provider implemented programming for youth during the reporting period.</p>
+      <div class="field">
+        <%= form.label :provider_served_youth %>
+        <%= form.check_box :provider_served_youth, disabled: true %>
+      </div>
+      <p>Indicate whether the provider used opt-out materials during the reporting period.</p>
+      <div class="field">
+        <%= form.label :using_optpout %>
+        <%= form.check_box :using_optpout, disabled: true %>
+      </div>  
+    </div>
+  </div>
+  <h2>Financials</h2>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <p>Provide the total dollar amount awarded to the provider for PREP grant activities during the reporting period.</p>
+      <div class="field">
+        <%= form.label :award_amount %>
+        <%= form.number_field :award_amount, disabled: true %>
+      </div>
+      <p>Provide the dollar amount of any additional non-PREP funding received by the provider from any source to support PREP programming. If no additional funding was received, report 0.</p>
+      <div class="field">
+        <%= form.label :nonprep_funding %>
+        <%= form.number_field :nonprep_funding, disabled: true %>
+      </div>
+    </div>
+  </div>
+  <h2>Personnel</h2>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <p>Provide a count of provider staff (such as PREP program directors and program coordinators), who were directly responsible for administering, managing, and overseeing the PREP program for the provider. In this measure, do not include in staff who provided programming directly to youth but did not oversee PREP. Count those staff in the facilitators measure located later in this section. If staff played both roles, include them in both measures.</p>
+      <div class="field">
+        <%= form.label :staffing_administering %>
+        <%= form.number_field :staffing_administering, disabled: true %>
+      </div>
+      <p>Provide a count of the number of vacancies for provider staff involved in administering PREP programs that occurred at any point during the reporting period. Report 0 if there were no vacancies.</p>
+      <div class="field">
+        <%= form.label :staffing_administrative_covid_vacancies_ever %>
+        <%= form.number_field :staffing_administrative_covid_vacancies_ever, disabled: true %>
+      </div>
+      <p>Of the vacancies reported in the previous measure, provide a count of the number filled by the end of the reporting period. Report 0 if vacancies were not filled.</p>
+      <div class="field">
+        <%= form.label :staffing_administrative_covid_vacancies_filled %>
+        <%= form.number_field :staffing_administrative_covid_vacancies_filled, disabled: true %>
+      </div>
+      <p>Provide a count of the FTEs among the provider staff, (such as PREP program directors and program coordinators), who were directly responsible for administering, managing, and overseeing the PREP program for the provider.</p>
+      <div class="field">
+        <%= form.label :staffing_fte_administering %>
+        <%= form.number_field :staffing_fte_administering, disabled: true %>
+      </div>
+      <p>Provide a count of the number of vacant FTEs among staff involved in administering PREP for the provider that occurred at any point during the reporting period. Report 0 if there were no vacant FTEs.</p>
+      <div class="field">
+        <%= form.label :staffing_fte_administering_covid_vacancies_ever %>
+        <%= form.number_field :staffing_fte_administering_covid_vacancies_ever, disabled: true %>
+      </div>
+      <p>Of the vacant FTEs reported in the previous measure, provide a count of the number filled by the end of the reporting period. Report 0 if vacancies were not filled.</p>
+      <div class="field">
+        <%= form.label :staffing_fte_administering_covid_vacancies_filled %>
+        <%= form.number_field :staffing_fte_administering_covid_vacancies_filled, disabled: true %>
+      </div>
+      <p>Provide the total number of PREP facilitators who worked for the provider that served youth during the reporting period. If the provider implements multiple PREP-funded programs, include all PREP facilitators across all PREP-funded programs.</p>
+      <div class="field">
+        <%= form.label :facilitators_total %>
+        <%= form.number_field :facilitators_total, disabled: true %>
+      </div>
+      <p>Provide a count of the number of vacancies for PREP facilitators that occurred at any point during the reporting period. Report 0 if there were no vacancies.</p>
+      <div class="field">
+        <%= form.label :facilitators_covid_vacancies_ever %>
+        <%= form.number_field :facilitators_covid_vacancies_ever, disabled: true %>
+      </div>
+      <p>Of the vacancies reported in the previous measure, provide a count of the number filled by the end of the reporting period. Report 0 if vacancies were not filled.</p>
+      <div class="field">
+        <%= form.label :facilitators_covid_vacancies_filled %>
+        <%= form.number_field :facilitators_covid_vacancies_filled, disabled: true %>
+      </div>
+      <p>Among the total number of PREP facilitators who worked for the provider during thereporting period, provide the number that were trained to deliver the core PREPprogram. If the provider implements multiple PREP-funded programs, provide a totalnumber of trained PREP program facilitators across all PREP-funded programs. Forthis measure, it is irrelevant whether the trainer was the grantee or designee orsome other entity.</p>
+      <div class="field">
+        <%= form.label :facilitators_trained_core_model %>
+        <%= form.number_field :facilitators_trained_core_model, disabled: true %>
+      </div>
+      <p>Among the total number of PREP program facilitators who worked for the providerduring the reporting period, indicate the number that were observed exactly onetime during this period. If the provider implements multiple PREP-funded programs,provide a total number of PREP program facilitators observed exactly once acrossall PREP-funded programs. For this measure, it is irrelevant whether the observingparty was the grantee or designee or some other entity.</p>
+      <div class="field">
+        <%= form.label :facilitators_observed_just_once %>
+        <%= form.number_field :facilitators_observed_just_once, disabled: true %>
+      </div>
+      <p>Among the total number of PREP program facilitators who worked for the provider during the reporting period, indicate the number that were observed two or more times during this period. If the provider implements multiple PREP-funded programs, provide a total number of PREP program facilitators observed two or more times across all PREP-funded programs. For this measure, it is irrelevant whether the observing party was the grantee or designee or some other entity.</p>
+      <div class="field">
+        <%= form.label :facilitators_observed_twice_more %>
+        <%= form.number_field :facilitators_observed_twice_more, disabled: true %>
+      </div>
+    </div>
+  </div>
+  <h2>Feedback</h2>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <p>Indicate the extent to which each possible challenge listed below was identified as a problem by the provider during the reporting period. Response options include not a problem, somewhat a problem, or a serious problem. Provide a response for each of the following challenges:</p>
+      <div class="field">
+        <%= form.label :challenges_recruiting_youth %>
+        <%= form.select(:challenges_recruiting_youth, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_engagement %>
+        <%= form.select(:challenges_engagement, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_attendance %>
+        <%= form.select(:challenges_attendance, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_recruiting_staff %>
+        <%= form.select(:challenges_recruiting_staff, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_staff_understanding %>
+        <%= form.select(:challenges_staff_understanding, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_covering_content %>
+        <%= form.select(:challenges_covering_content, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_turnover %>
+        <%= form.select(:challenges_turnover, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_negative_peer_interactions %>
+        <%= form.select(:challenges_negative_peer_interactions, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_youth_behavioral %>
+        <%= form.select(:challenges_youth_behavioral, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_facilities %>
+        <%= form.select(:challenges_facilities, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_natural_disasters %>
+        <%= form.select(:challenges_natural_disasters, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :challenges_stakeholder_support %>
+        <%= form.select(:challenges_stakeholder_support, ['Not a challenge', 'Somewhat a challenge', 'A serious challenge'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+      <p>Indicate the extent to which the provider would like to receive technical assistance for each identified implementation factor listed below. Response categories include not interested, already received; not interested; somewhat interested; or very interested. If the provider has already received technical assistance for a specific implementation factor and does not need additional assistance in that area, select not interested. Provide a response for each of the following implementation factors:</p>
+      <div class="field">
+        <%= form.label :tta_recruiting_youth %>
+        <%= form.select(:tta_recruiting_youth, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_engagement %>
+        <%= form.select(:tta_engagement, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_attendance %>
+        <%= form.select(:tta_attendance, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_recruiting_staff %>
+        <%= form.select(:tta_recruiting_staff, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_training_facilitators %>
+        <%= form.select(:tta_training_facilitators, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_retaining_staff %>
+        <%= form.select(:tta_retaining_staff, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_minimize_negative_peer %>
+        <%= form.select(:tta_minimize_negative_peer, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_addressing_behavior %>
+        <%= form.select(:tta_addressing_behavior, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_obtaining_support %>
+        <%= form.select(:tta_obtaining_support, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_evaluation %>
+        <%= form.select(:tta_evaluation, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_parent_support %>
+        <%= form.select(:tta_parent_support, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tta_other_rating %> <%= form.label :tta_other_text %>
+        <%= form.text_field :tta_other_text, required: false, disabled: true %>
+
+        <%= form.select(:tta_other_rating, ['Received', 'Not interested', 'Somewhat interested', 'Very interested'], {}, { "data-placeholder": "(Blank)", disabled: true }) %>
+      </div>
+    </div>
+  </div>
+  
+  <h2>Finalize</h2>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <div class="field">
+        <%= form.check_box :done %>
+        <%= form.label :done, disabled: true %>
+      </div>  
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

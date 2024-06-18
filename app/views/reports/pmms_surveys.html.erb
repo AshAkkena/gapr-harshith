@@ -1,0 +1,1537 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    //$(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+<h1>Range selection</h1>
+      <div class="field">
+        <%= form_tag(participant_surveys_path(provider_id: params[:provider_id], curriculum_initials: params[:curriculum_initials]), method: :get) do %>
+          <%= text_field_tag :start, params[:start], required: true, class: "datepicker" %>
+          <%= text_field_tag :stop, params[:stop], required: true, class: "datepicker" %>
+          <%= submit_tag ("Go") %>
+        <% end %>
+      </div>
+
+<h1>PMMS Reports</h1>
+<% if @included_cohorts.empty? %>
+  <p>No surveys were found for this combination of provider, curriculum, and time range.<br />Try checking your <%= link_to 'filters', filters_path %></p>
+<% else %>
+  <table class="apa">
+  <% if params[:curriculum_initials] == "ALL" %>
+    <caption>Included cohorts for all curricula from <%= @window_start %> to <%= @window_stop %></caption>
+  <% else %>
+    <caption>Included cohorts for <%= @my_provider[:pmms_aggregate_name].to_s %> (<%= params[:curriculum_initials].to_s %>) from <%= @window_start %> to <%= @window_stop %></caption>
+  <% end %>
+  
+    <thead>
+      <tr>
+        <th></th>
+        <th>Provider</th>
+        <th colspan="2">Name</th>
+        <th colspan="2">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Meeting Dates</div></div>
+          <div class="row">
+            <div class="col">Earliest</div>
+            <div class="col">Latest</div>
+          </div>
+        </th>
+        <th colspan="2">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Sessions</div></div>
+          <div class="row">
+            <div class="col">Count</div>
+            <div class="col">Duration</div>
+          </div>
+        </th>
+        <% if current_user.has_role?(:technician) %>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Initiates</div></div>
+            <div class="row">
+              <div class="col">MS</div>
+              <div class="col">HS</div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Graduates</div></div>
+            <div class="row">
+              <div class="col">MS</div>
+              <div class="col">HS</div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Surveys</div></div>
+            <div class="row">
+              <div class="col">Entry</div>
+              <div class="col">Exit</div>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @included_cohorts.each do |cohort| %>
+        <tr>
+          <td><%= link_to '?', cohort %></td>
+          <td><%= cohort.provider.long_name %></td>
+          <td><%= cohort.name %></td>
+          <td><%= cohort.extra_name %></td>
+          <td><%= cohort.earliest_date %></td>
+          <td><%= cohort.latest_date %></td>
+          <td><%= cohort.intended_session_count %></td>
+          <td><%= cohort.intended_session_duration_minute %></td>
+          <% if current_user.has_role?(:technician) %>
+            <td style="color: <%= (cohort.coho_down.present? ? cohort.coho_down.total_initiated_ms : cohort.session_logs.pluck(:newface_ms_headcount).sum) > 0 ?  "green" : "yellow" %>"><%= cohort.coho_down.present? ? cohort.coho_down.total_initiated_ms : (cohort.session_logs.pluck(:newface_ms_headcount).sum.to_s + '*') %></d>
+            <td style="color: <%= (cohort.coho_down.present? ? cohort.coho_down.total_initiated_hs : cohort.session_logs.pluck(:newface_hs_headcount).sum) > 0 ?  "green" : "yellow" %>"><%= cohort.coho_down.present? ? cohort.coho_down.total_initiated_hs : (cohort.session_logs.pluck(:newface_hs_headcount).sum.to_s + '*') %></d>
+            <td style="color: <%= (cohort.coho_down.present? ? cohort.coho_down.total_graduated_ms : 0) <=  (cohort.coho_down.present? ? cohort.coho_down.total_initiated_ms : cohort.session_logs.pluck(:newface_ms_headcount).sum) ?  "green" : "red" %>"><%= cohort.coho_down.present? ? cohort.coho_down.total_graduated_ms : '-' %></d>
+            <td style="color: <%= (cohort.coho_down.present? ? cohort.coho_down.total_graduated_hs : 0) <=  (cohort.coho_down.present? ? cohort.coho_down.total_initiated_hs : cohort.session_logs.pluck(:newface_hs_headcount).sum) ?  "green" : "red" %>"><%= cohort.coho_down.present? ? cohort.coho_down.total_graduated_hs : '-' %></d>
+            <td style="color: <%= ((cohort.coho_down.present? ? cohort.coho_down.total_initiated_ms : cohort.session_logs.pluck(:newface_ms_headcount).sum) + (cohort.coho_down.present? ? cohort.coho_down.total_initiated_hs : cohort.session_logs.pluck(:newface_hs_headcount).sum)) >= cohort.entry_surveys.length ?  "green" : "red" %>"><%= cohort.entry_surveys.length %></td>
+            <td style="color: <%= ((cohort.coho_down.present? ? cohort.coho_down.total_graduated_ms : 0) + (cohort.coho_down.present? ? cohort.coho_down.total_graduated_hs : 0)) >= cohort.exit_surveys.length ?  "green" : (((cohort.coho_down.present? ? cohort.coho_down.total_initiated_ms : cohort.session_logs.pluck(:newface_ms_headcount).sum) + (cohort.coho_down.present? ? cohort.coho_down.total_initiated_hs : cohort.session_logs.pluck(:newface_hs_headcount).sum)) >= cohort.exit_surveys.length ? "yellow" : "red") %>"><%= cohort.exit_surveys.length %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if params[:provider_id].to_i != 0 %>
+    <h2>Program Delivery</h2>
+    <p>Curriculum: <%= @included_cohorts.first.curriculum_choice %><br />
+    Intended Program Delivery Hours: <%= @included_cohorts.first.curriculum_choice == "MAD" ? 12 : 12 %>h
+
+    <h2>Target Population</h2>
+    <p>Did <i>any</i> of the included cohorts target the following populations?</p>
+    <table class="apa">
+      <caption>Targetted populations</caption>
+      <thead>
+        <tr>
+          <th>Demographic</th>
+          <th>Targetted?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Youth in foster care</td>
+          <td><%= @included_cohorts.pluck(:target_foster).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Homeless or runaway youth</td>
+          <td><%= @included_cohorts.pluck(:target_homeless_runaway).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Youth living with HIV/AIDS</td>
+          <td><%= @included_cohorts.pluck(:target_hiv_aids).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Pregnant or Parenting youth</td>
+          <td><%= @included_cohorts.pluck(:target_pregnant_parenting).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Hispanic/Latino youth</td>
+          <td><%= @included_cohorts.pluck(:target_latino).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>African American youth</td>
+          <td><%= @included_cohorts.pluck(:target_african_american).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Native American youth</td>
+          <td><%= @included_cohorts.pluck(:target_native_american).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>LGBTQ youth</td>
+          <% if @included_cohorts.joins(:coho_up).length > 0 %>
+            <td><%= @included_cohorts.joins(:coho_up).map{|i| i.coho_up[:ppr_count_lgbt]}.sum > 0 ? "• Y  " : "  N •"  %></td>
+          <% else %>
+            <td>  N •</td>
+          <% end %>
+        </tr>
+        <tr>
+          <td>Youth in adjudication systems</td>
+          <td><%= @included_cohorts.pluck(:target_adjudicated).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Male youth</td>
+          <td><%= @included_cohorts.pluck(:target_male).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Youth in high-need geographic areas</td>
+          <td><%= @included_cohorts.pluck(:target_highneed_geo).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Out of school/dropout youth</td>
+          <td><%= @included_cohorts.pluck(:target_dropout).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Youth in residential treatment for mental health issues</td>
+          <td><%= @included_cohorts.pluck(:target_mental_health).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <tr>
+          <td>Trafficked youth</td>
+          <td><%= @included_cohorts.pluck(:target_trafficked).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Adulthood Preparation Subjects</h2>
+    <p>Did <i>any</i> of the included cohorts cover these areas? If so, how?</p>
+    <table class="apa">
+      <thead>
+        <tr> 
+          <th>Subject</th>
+          <th colspan="2">Covered?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Healthy Relationships</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_healthy_relationship).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_healthy_relationship).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:healthy_relationship_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:healthy_relationship_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:healthy_relationship_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:healthy_relationship_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td>Adolescent Development</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_adolescent_development).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_adolescent_development).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:adolescent_development_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:adolescent_development_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:adolescent_development_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:adolescent_development_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td>Financial Literacy</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_financial_literacy).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_financial_literacy).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:financial_literacy_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:financial_literacy_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:financial_literacy_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:financial_literacy_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td>Parent Child Communication</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_par_child_comm).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_par_child_comm).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:par_child_comm_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:par_child_comm_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:par_child_comm_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:par_child_comm_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td>Educational and Career Success</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_edu_career_success).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_edu_career_success).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:edu_career_success_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:edu_career_success_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:edu_career_success_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:edu_career_success_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td>Healthy Life Skills</td>
+          <td></td>
+          <td><%= @included_cohorts.pluck(:covered_healthy_life_skills).any? ? "• Y  " : "  N •"  %></td>
+        </tr>
+        <% if @included_cohorts.pluck(:covered_healthy_life_skills).any? %>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using the evidence-based curriculum</td>
+            <td><%= @included_cohorts.pluck(:healthy_life_skills_material_evidence_based).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Incorporating entirely</td>
+            <td><%= @included_cohorts.pluck(:healthy_life_skills_material_add_curr_entirely).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Adding selections from other curricula</td>
+            <td><%= @included_cohorts.pluck(:healthy_life_skills_material_add_curr_adhoc).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;Using original content</td>
+            <td><%= @included_cohorts.pluck(:healthy_life_skills_material_original_content).any? ? "• Y  " : "  N •"  %></td>
+            <td></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <hr />
+    <p>Did any youth begin this program between <%= @window_start %> - <%= @window_stop %>? <b><%= @check_begin ? "Yes" : "No" %></b></p>
+    <% if @check_begin %>
+      <p>Did the program receive an approved waiver letter...? <b>No</b></p>
+      <p>At any point ... was the program unable to collect Entry Survey data due to COVID-19? <b>No</b></p>
+      <p>What method(s) of data collection did the program use...?</p>
+      <p>In-person paper-and-pencil survey <b>No</b></p>
+      <p>Online, web-based survey <b>Yes</b></p>
+      <p>Telephone survey <b>No</b></p>
+      <p>Mail survey <b>No</b></p>
+      <p>Other <b>No</b></p>
+    <% end %>
+    <hr />
+    <p>Did any youth finish this program between <%= @window_start %> - <%= @window_stop %>? <b><%= @check_complete ? "Yes" : "No" %></b></p>
+    <% if @check_complete %>
+      <p>Did the program receive an approved waiver letter...? <b>No</b></p>
+      <p>At any point ... was the program unable to collect Exit Survey data due to COVID-19? <b>No</b></p>
+      <p>What method(s) of data collection did the program use...?</p>
+      <p>In-person paper-and-pencil survey <b>No</b></p>
+      <p>Online, web-based survey <b>Yes</b></p>
+      <p>Telephone survey <b>No</b></p>
+      <p>Mail survey <b>No</b></p>
+      <p>Other <b>No</b></p>
+    <% end %>
+    <hr />
+  <% end %>
+  <table class="apa">
+    <caption>Participant Counts</caption>
+    <thead>
+      <th>Category</th>
+      <th>Count</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Attended at least one program session</td>
+        <td><%= @counts_initiate_all %></td>
+      </tr>
+      <tr>
+        <td>Number of middle school age participants</td>
+        <td><%= @counts_initiate_ms %></td>
+      </tr>
+      <tr>
+        <td>Number of high school age or older participants</td>
+        <td><%= @counts_initiate_hs %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="apa">
+    <caption>Program Settings</caption>
+    <thead>
+      <th>Category</th>
+      <th>Count</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Attended a session In School, during school</td>
+        <td><%= @program_settings[0] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session In School, after school</td>
+        <td><%= @program_settings[1] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Community-Based Organization</td>
+        <td><%= @program_settings[2] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Clinic</td>
+        <td><%= @program_settings[3] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Foster Care Setting</td>
+        <td><%= @program_settings[4] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Juvenile Detention Setting</td>
+        <td><%= @program_settings[5] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Residential Mental Health Treatment Facility</td>
+        <td><%= @program_settings[6] %></td>
+      </tr>
+      <tr>
+        <td>Attended a session Virtual</td>
+        <td><%= @program_settings[7] %></td>
+      </tr><tr>
+        <td>Attended a session Other</td>
+        <td><%= @program_settings[8] %></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="row">
+    <% if params[:provider_id].to_i != 0 %>
+      <div class="col-sm-2">
+        <table class="apa">
+          <caption>Program Reach</caption>
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Over half?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>In foster care</td>
+              <td><%= @program_reach[:foster] ? "✔" : "✖" %></td>
+            </tr>
+            <tr>
+              <td>Homeless or runaway</td>
+              <td><%= @program_reach[:homeless] ? "✔" : "✖" %></td>
+            </tr>
+            <tr>
+              <td>Pregnant or parenting</td>
+              <td><%= @program_reach[:pregnant] ? "✔" : "✖" %></td>
+            </tr>
+            <tr>
+              <td>LGBTQ youth</td>
+              <td><%= @program_reach[:lgbt] ? "✔" : "✖" %></td>
+            </tr>
+            <tr>
+              <td>In adjucation systems</td>
+              <td><%= @program_reach[:adjudication] ? "✔" : "✖" %></td>
+            </tr>
+            <tr>
+              <td>None of the above</td>
+              <td><%= @program_reach[:none] ? "✔" : "✖" %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+    <div class="col-sm-2">
+      <table class="apa">
+        <caption>Count of youth who completed</caption>
+        <tbody>
+          <tr>
+            <td>75% of scheduled program hours</td>
+            <td><%= @included_cohorts.joins(:coho_down).pluck(:total_graduated_ms).sum +  @included_cohorts.joins(:coho_down).pluck(:total_graduated_hs).sum %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if params[:provider_id].to_i != 0 %>
+    <table class="apa">
+      <caption>Program hours delivered by cohort</caption>
+      <thead>
+        <tr>
+          <th colspan="3">Cohort</th>
+          <th>How many hours, overall?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @included_cohorts.each do |cohort| %>
+          <tr>
+            <td><%= cohort.provider.long_name %></td>
+            <td><%= cohort.name %></td>
+            <td><%= cohort.extra_name %></td>
+            <td><%= (cohort.intended_session_count * cohort.intended_session_duration_minute) / 60.to_f%></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+  <h2>Entry Surveys</h2>
+    <div class="row">
+      <div class="col">
+        <table class="apa">
+          <caption>Youth Characteristics (at Program Entry)</caption>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="2"></td></tr>
+            <tr><td>Total Surveys Completed</td><td><%= @results_entry[:total_all] %></td></tr>
+            <tr><td>Total MS Survey Completed</td><td><%= @results_entry[:total_ms] %></td></tr>
+            <tr><td>Total HS Survey Completed</td><td><%= @results_entry[:total_hs] %></td></tr>
+            
+            <tr><td colspan="2">Totals by sex</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Male</td><td><%= @results_entry[:gender_m] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Female</td><td><%= @results_entry[:gender_f] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:gender_totals] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:gender_missing] %></td></tr>
+            
+            
+            
+            <tr><td colspan="2">Totals by race</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;American Indian/Native Alaskan</td><td><%= @results_entry[:race_indian] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Asian</td><td><%= @results_entry[:race_asian] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Black or African American </td><td><%= @results_entry[:race_black] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Native Hawaiian/Pacific Islander </td><td><%= @results_entry[:race_pacific] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;White</td><td><%= @results_entry[:race_white] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other</td><td><%= @results_entry[:race_other] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_1][0] %>)</td><td><%= @results_entry[:race_other_1][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_2][0] %>)</td><td><%= @results_entry[:race_other_2][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_3][0] %>)</td><td><%= @results_entry[:race_other_3][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_4][0] %>)</td><td><%= @results_entry[:race_other_4][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_5][0] %>)</td><td><%= @results_entry[:race_other_5][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_6][0] %>)</td><td><%= @results_entry[:race_other_6][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_7][0] %>)</td><td><%= @results_entry[:race_other_7][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_8][0] %>)</td><td><%= @results_entry[:race_other_8][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_9][0] %>)</td><td><%= @results_entry[:race_other_9][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:race_other_10][0] %>)</td><td><%= @results_entry[:race_other_10][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Additional other race not listed previously listed.</td><td><%= @results_entry[:race_other_extra] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:race_totals] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:race_missing] %></td></tr>
+            
+            <tr><td colspan="2">Totals by ethnicity</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Hispanic</td><td><%= @results_entry[:ethnicity_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total non-Hispanic</td><td><%= @results_entry[:ethnicity_not_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:ethnicity_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:ethnicity_missing] %></td></tr>
+            
+            <tr><td colspan="2">Totals by language</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;English</td><td><%= @results_entry[:lang_en] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Spanish</td><td><%= @results_entry[:lang_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other</td><td><%= @results_entry[:lang_other] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_1][0] %>)</td><td><%= @results_entry[:lang_other_1][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_2][0] %>)</td><td><%= @results_entry[:lang_other_2][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_3][0] %>)</td><td><%= @results_entry[:lang_other_3][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_4][0] %>)</td><td><%= @results_entry[:lang_other_4][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_5][0] %>)</td><td><%= @results_entry[:lang_other_5][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_6][0] %>)</td><td><%= @results_entry[:lang_other_6][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_7][0] %>)</td><td><%= @results_entry[:lang_other_7][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_8][0] %>)</td><td><%= @results_entry[:lang_other_8][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_9][0] %>)</td><td><%= @results_entry[:lang_other_9][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_entry[:lang_other_10][0] %>)</td><td><%= @results_entry[:lang_other_10][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Language other than English, Spanish, and languages listed in previous fields</td><td><%= @results_entry[:lang_other_extra] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:lang_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:lang_missing] %></td></tr>
+            
+            <tr><td colspan="2">Participation by age</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 10</td><td><%= @results_entry[:age_10] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 11</td><td><%= @results_entry[:age_11] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 12</td><td><%= @results_entry[:age_12] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 13</td><td><%= @results_entry[:age_13] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 14</td><td><%= @results_entry[:age_14] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 15</td><td><%= @results_entry[:age_15] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 16</td><td><%= @results_entry[:age_16] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 17</td><td><%= @results_entry[:age_17] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 18</td><td><%= @results_entry[:age_18] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 19</td><td><%= @results_entry[:age_19] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 20</td><td><%= @results_entry[:age_20] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 21</td><td><%= @results_entry[:age_21] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Respondents</td><td><%= @results_entry[:age_responses] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:age_missing] %></td></tr>
+                                                                    
+            <tr><td colspan="2">Participation by grade</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 5</td><td><%= @results_entry[:grade_5] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 6</td><td><%= @results_entry[:grade_6] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 7</td><td><%= @results_entry[:grade_7] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 8</td><td><%= @results_entry[:grade_8] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 9</td><td><%= @results_entry[:grade_9] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 10</td><td><%= @results_entry[:grade_10] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 11</td><td><%= @results_entry[:grade_11] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 12</td><td><%= @results_entry[:grade_12] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Ungraded</td><td><%= @results_entry[:grade_ungraded] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Not In school / dropped out</td><td><%= @results_entry[:grade_dropout] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Working toward GED</td><td><%= @results_entry[:grade_getting_ged] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;HS grad / GED , no post-secondary</td><td><%= @results_entry[:grade_grad_nosec] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;HS grad / GED, in post-secondary</td><td><%= @results_entry[:grade_grad_sec] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;I am not currently enrolled in school</td><td><%= @results_entry[:grade_not_in] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Respondents</td><td><%= @results_entry[:grade_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:grade_missing] %></td></tr>
+                                                           
+            <tr><td colspan="2">Totals by residence</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Living with family</td><td><%= @results_entry[:lives_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Foster care / living with family</td><td><%= @results_entry[:lives_foster_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Foster care / living in a group home</td><td><%= @results_entry[:lives_foster_group] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Couch surfing or moving from house to house</td><td><%= @results_entry[:lives_couch] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Outside/Tent city/Homeless camp/Car/Vehicle/Abandoned Building</td><td><%= @results_entry[:lives_outside] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Emergency shelter / transitional living program</td><td><%= @results_entry[:lives_shelter] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Hotel/Motel</td><td><%= @results_entry[:lives_hotel] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Juvenile detention / juvenile group home / probation officer</td><td><%= @results_entry[:lives_jail] %></td></tr>
+            <tr style="border-bottom: 3px solid black"><td>&nbsp;&nbsp;&nbsp;&nbsp;None of the above</td><td><%= @results_entry[:lives_none] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth living with family</td><td><%= @results_entry[:lives_totals_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth in foster care</td><td><%= @results_entry[:lives_totals_foster] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as runaway or homeless youth</td><td><%= @results_entry[:lives_totals_homeless] %></td></tr>
+            <tr style="border-bottom: 3px solid black"><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth in adjudication system</td><td><%= @results_entry[:lives_totals_adjudicaton] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:lives_totals_any] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:lives_totals_missing] %></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="apa">
+          <caption>Attitudes, Beliefs, and Behaviors</caption>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th colspan="6">Frequencies</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="1"></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">All of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Most of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Some of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">None of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td>8a. Resisted or said no to peer pressure</td>
+              <td><%= @results_entry[:behavior_peer_all] %></td>
+              <td><%= @results_entry[:behavior_peer_most] %></td>
+              <td><%= @results_entry[:behavior_peer_some] %></td>
+              <td><%= @results_entry[:behavior_peer_none] %></td>
+              <td><%= @results_entry[:behavior_peer_missing] %></td>
+              <td><%= @results_entry[:behavior_peer_totals] %></td>
+            </tr>
+            <tr>
+              <td>8b. Managed your emotions in healthy ways</td>
+              <td><%= @results_entry[:behavior_emotion_all] %></td>
+              <td><%= @results_entry[:behavior_emotion_most] %></td>
+              <td><%= @results_entry[:behavior_emotion_some] %></td>
+              <td><%= @results_entry[:behavior_emotion_none] %></td>
+              <td><%= @results_entry[:behavior_emotion_missing] %></td>
+              <td><%= @results_entry[:behavior_emotion_totals] %></td>
+            </tr>
+            <tr>
+              <td>8c. Made decisions to not use drugs and alcohol</td>
+              <td><%= @results_entry[:behavior_alcohol_all] %></td>
+              <td><%= @results_entry[:behavior_alcohol_most] %></td>
+              <td><%= @results_entry[:behavior_alcohol_some] %></td>
+              <td><%= @results_entry[:behavior_alcohol_none] %></td>
+              <td><%= @results_entry[:behavior_alcohol_missing] %></td>
+              <td><%= @results_entry[:behavior_alcohol_totals] %></td>
+            </tr>
+            <tr>
+              <td>8d. Thought about consequences</td>
+              <td><%= @results_entry[:behavior_think_all] %></td>
+              <td><%= @results_entry[:behavior_think_most] %></td>
+              <td><%= @results_entry[:behavior_think_some] %></td>
+              <td><%= @results_entry[:behavior_think_none] %></td>
+              <td><%= @results_entry[:behavior_think_missing] %></td>
+              <td><%= @results_entry[:behavior_think_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not true at all</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Very true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td colspan="2">9a. Make plans to reach your goals</td>
+              <td><%= @results_entry[:intent_plans_not] %></td>
+              <td><%= @results_entry[:intent_plans_somewhat] %></td>
+              <td><%= @results_entry[:intent_plans_very] %></td>
+              <td><%= @results_entry[:intent_plans_missing] %></td>
+              <td><%= @results_entry[:intent_plans_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9b. Care about doing well in school</td>
+              <td><%= @results_entry[:intent_study_not] %></td>
+              <td><%= @results_entry[:intent_study_somewhat] %></td>
+              <td><%= @results_entry[:intent_study_very] %></td>
+              <td><%= @results_entry[:intent_study_missing] %></td>
+              <td><%= @results_entry[:intent_study_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9c. Graduate high school or get your GED</td>
+              <td><%= @results_entry[:intent_graduate_not] %></td>
+              <td><%= @results_entry[:intent_graduate_somewhat] %></td>
+              <td><%= @results_entry[:intent_graduate_very] %></td>
+              <td><%= @results_entry[:intent_graduate_missing] %></td>
+              <td><%= @results_entry[:intent_graduate_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9d. Get more education or training</td>
+              <td><%= @results_entry[:intent_more_study_not] %></td>
+              <td><%= @results_entry[:intent_more_study_somewhat] %></td>
+              <td><%= @results_entry[:intent_more_study_very] %></td>
+              <td><%= @results_entry[:intent_more_study_missing] %></td>
+              <td><%= @results_entry[:intent_more_study_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9e. Get a steady full-time job</td>
+              <td><%= @results_entry[:intent_work_not] %></td>
+              <td><%= @results_entry[:intent_work_somewhat] %></td>
+              <td><%= @results_entry[:intent_work_very] %></td>
+              <td><%= @results_entry[:intent_work_missing] %></td>
+              <td><%= @results_entry[:intent_work_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9f. Speak up, ask for help, if bullied</td>
+              <td><%= @results_entry[:intent_speakup_self_not] %></td>
+              <td><%= @results_entry[:intent_speakup_self_somewhat] %></td>
+              <td><%= @results_entry[:intent_speakup_self_very] %></td>
+              <td><%= @results_entry[:intent_speakup_self_missing] %></td>
+              <td><%= @results_entry[:intent_speakup_self_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">9g. Speak up, ask for help, if others bullied</td>
+              <td><%= @results_entry[:intent_speakup_others_not] %></td>
+              <td><%= @results_entry[:intent_speakup_others_somewhat] %></td>
+              <td><%= @results_entry[:intent_speakup_others_very] %></td>
+              <td><%= @results_entry[:intent_speakup_others_missing] %></td>
+              <td><%= @results_entry[:intent_speakup_others_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not true at all</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Very true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td colspan="2">10a. Save money to get things I want</td>
+              <td><%= @results_entry[:finance_save_not] %></td>
+              <td><%= @results_entry[:finance_save_somewhat] %></td>
+              <td><%= @results_entry[:finance_save_very] %></td>
+              <td><%= @results_entry[:finance_save_missing] %></td>
+              <td><%= @results_entry[:finance_save_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">10b. Confident about how to open a bank account</td>
+              <td><%= @results_entry[:finance_bank_not] %></td>
+              <td><%= @results_entry[:finance_bank_somewhat] %></td>
+              <td><%= @results_entry[:finance_bank_very] %></td>
+              <td><%= @results_entry[:finance_bank_missing] %></td>
+              <td><%= @results_entry[:finance_bank_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">10c. Confident about how to prepare a budget</td>
+              <td><%= @results_entry[:finance_budget_not] %></td>
+              <td><%= @results_entry[:finance_budget_somewhat] %></td>
+              <td><%= @results_entry[:finance_budget_very] %></td>
+              <td><%= @results_entry[:finance_budget_missing] %></td>
+              <td><%= @results_entry[:finance_budget_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">10d. Confident about how to track my expenses</td>
+              <td><%= @results_entry[:finance_track_not] %></td>
+              <td><%= @results_entry[:finance_track_somewhat] %></td>
+              <td><%= @results_entry[:finance_track_very] %></td>
+              <td><%= @results_entry[:finance_track_missing] %></td>
+              <td><%= @results_entry[:finance_track_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">10e. Understand cost associated with raising a child</td>
+              <td><%= @results_entry[:finance_cost_not] %></td>
+              <td><%= @results_entry[:finance_cost_somewhat] %></td>
+              <td><%= @results_entry[:finance_cost_very] %></td>
+              <td><%= @results_entry[:finance_cost_missing] %></td>
+              <td><%= @results_entry[:finance_cost_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="1"></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">All of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Most of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Some of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">None of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td>11a. Talked about things going on in your life</td>
+              <td><%= @results_entry[:talk_other_all] %></td>
+              <td><%= @results_entry[:talk_other_most] %></td>
+              <td><%= @results_entry[:talk_other_some] %></td>
+              <td><%= @results_entry[:talk_other_none] %></td>
+              <td><%= @results_entry[:talk_other_missing] %></td>
+              <td><%= @results_entry[:talk_other_totals] %></td>
+            </tr>
+            <tr>
+              <td>11b. Talked about sex</td>
+              <td><%= @results_entry[:talk_parent_all] %></td>
+              <td><%= @results_entry[:talk_parent_most] %></td>
+              <td><%= @results_entry[:talk_parent_some] %></td>
+              <td><%= @results_entry[:talk_parent_none] %></td>
+              <td><%= @results_entry[:talk_parent_missing] %></td>
+              <td><%= @results_entry[:talk_parent_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not true at all</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Very true of me</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td colspan="2">12a. Understand what makes a relationship healthy</td>
+              <td><%= @results_entry[:relate_healthy_not] %></td>
+              <td><%= @results_entry[:relate_healthy_somewhat] %></td>
+              <td><%= @results_entry[:relate_healthy_very] %></td>
+              <td><%= @results_entry[:relate_healthy_missing] %></td>
+              <td><%= @results_entry[:relate_healthy_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">12b. Say no to someone</td>
+              <td><%= @results_entry[:relate_resist_not] %></td>
+              <td><%= @results_entry[:relate_resist_somewhat] %></td>
+              <td><%= @results_entry[:relate_resist_very] %></td>
+              <td><%= @results_entry[:relate_resist_missing] %></td>
+              <td><%= @results_entry[:relate_resist_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="2">12c. Talk to a trusted person/adult</td>
+              <td><%= @results_entry[:relate_talk_not] %></td>
+              <td><%= @results_entry[:relate_talk_somewhat] %></td>
+              <td><%= @results_entry[:relate_talk_very] %></td>
+              <td><%= @results_entry[:relate_talk_missing] %></td>
+              <td><%= @results_entry[:relate_talk_totals] %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="apa">
+          <caption>Attitudes, Beliefs, and Behaviors</caption>
+          <thead>
+            <tr>
+              <th colspan="1">Item</th>
+              <th colspan="9">Frequencies</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="10">13. Ever had sex</td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Yes</td><td><%= @results_entry[:hadsex_yes] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;No</td><td><%= @results_entry[:hadsex_no] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:hadsex_missing] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total middle school version</td><td><%= @results_entry[:hadsex_middle] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_entry[:hadsex_totals] %></td></tr>
+
+            <tr><td colspan="10">14. Number of people had sex with in past 3 months</td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Never had intercourse</td><td><%= @results_entry[:num_partners_never] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Intercourse, but not in past 3 months</td><td><%= @results_entry[:num_partners_notrecently] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;1 person</td><td><%= @results_entry[:num_partners_1] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;2-3 people</td><td><%= @results_entry[:num_partners_2] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;4 or more people</td><td><%= @results_entry[:num_partners_4] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:num_partners_missing] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total middle school version</td><td><%= @results_entry[:num_partners_middle] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total respondents </td><td><%= @results_entry[:num_partners_totals] %></td></tr>
+
+            <tr>
+              <td></td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Never had intercourse</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">No intercourse in past 3 months</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">All of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Most of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Some of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">None of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total middle school version</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+                               
+            <tr>
+              <td>15. How often used condom in past 3 months</td>
+              <td><%= @results_entry[:condom_neversex] %></td>
+              <td><%= @results_entry[:condom_notrecently] %></td>
+              <td><%= @results_entry[:condom_always] %></td>
+              <td><%= @results_entry[:condom_mostly] %></td>
+              <td><%= @results_entry[:condom_sometimes] %></td>
+              <td><%= @results_entry[:condom_never] %></td>
+              <td><%= @results_entry[:condom_missing] %></td>
+              <td><%= @results_entry[:condom_middle] %></td>
+              <td><%= @results_entry[:condom_totals] %></td>
+            </tr>
+
+            <tr>
+              <td>16. How often used birth control in past 3 months</td>
+              <td><%= @results_entry[:contraceptive_neversex] %></td>
+              <td><%= @results_entry[:contraceptive_notrecently] %></td>
+              <td><%= @results_entry[:contraceptive_always] %></td>
+              <td><%= @results_entry[:contraceptive_mostly] %></td>
+              <td><%= @results_entry[:contraceptive_sometimes] %></td>
+              <td><%= @results_entry[:contraceptive_never] %></td>
+              <td><%= @results_entry[:contraceptive_missing] %></td>
+              <td><%= @results_entry[:contraceptive_middle] %></td>
+              <td><%= @results_entry[:contraceptive_totals] %></td>
+            </tr>
+
+            <tr><td colspan="10">17. Ever been/gotten someone pregnant</td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Never had intercourse</td><td><%= @results_entry[:preg_never] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Yes</td><td><%= @results_entry[:preg_yes] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;No</td><td><%= @results_entry[:preg_no] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Not sure</td><td><%= @results_entry[:preg_unsure] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:preg_missing] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total middle school version</td><td><%= @results_entry[:preg_middle] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total respondents </td><td><%= @results_entry[:preg_totals] %></td></tr>
+
+            <tr><td colspan="10">18. Ever told had a STI</td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Yes</td><td><%= @results_entry[:sti_yes] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;No</td><td><%= @results_entry[:sti_no] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_entry[:sti_missing] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total middle school version</td><td><%= @results_entry[:sti_middle] %></td></tr>
+            <tr><td colspan="9">&nbsp;&nbsp;&nbsp;&nbsp;Total respondents </td><td><%= @results_entry[:sti_totals] %></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <h2>Exit Surveys</h2>
+    <div class="row">
+      <div class="col">
+        <table class="apa">
+          <caption>Youth Characteristics (at Program Exit)</caption>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="2"></td></tr>
+            <tr><td>Total Surveys Completed</td><td><%= @results_exit[:total_all] %></td></tr>
+            <tr><td>Total MS Survey Completed</td><td><%= @results_exit[:total_ms] %></td></tr>
+            <tr><td>Total HS Survey Completed</td><td><%= @results_exit[:total_hs] %></td></tr>
+            
+            <tr><td colspan="2">Totals by sex</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Male</td><td><%= @results_exit[:gender_m] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Female</td><td><%= @results_exit[:gender_f] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:gender_totals] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:gender_missing] %></td></tr>
+            
+            <tr><td colspan="2">Totals by race</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;American Indian/Native Alaskan</td><td><%= @results_exit[:race_indian] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Asian</td><td><%= @results_exit[:race_asian] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Black or African American </td><td><%= @results_exit[:race_black] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Native Hawaiian/Pacific Islander </td><td><%= @results_exit[:race_pacific] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;White</td><td><%= @results_exit[:race_white] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other</td><td><%= @results_exit[:race_other] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_1][0] %>)</td><td><%= @results_exit[:race_other_1][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_2][0] %>)</td><td><%= @results_exit[:race_other_2][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_3][0] %>)</td><td><%= @results_exit[:race_other_3][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_4][0] %>)</td><td><%= @results_exit[:race_other_4][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_5][0] %>)</td><td><%= @results_exit[:race_other_5][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_6][0] %>)</td><td><%= @results_exit[:race_other_6][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_7][0] %>)</td><td><%= @results_exit[:race_other_7][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_8][0] %>)</td><td><%= @results_exit[:race_other_8][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_9][0] %>)</td><td><%= @results_exit[:race_other_9][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:race_other_10][0] %>)</td><td><%= @results_exit[:race_other_10][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Additional other race not listed previously listed.</td><td><%= @results_exit[:race_other_extra] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:race_totals] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:race_missing] %></td></tr>
+            
+            <tr><td colspan="2">Totals by ethnicity</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Hispanic</td><td><%= @results_exit[:ethnicity_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total non-Hispanic</td><td><%= @results_exit[:ethnicity_not_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:ethnicity_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:ethnicity_missing] %></td></tr>
+            
+            <tr><td colspan="2">Totals by language</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;English</td><td><%= @results_exit[:lang_en] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Spanish</td><td><%= @results_exit[:lang_sp] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other</td><td><%= @results_exit[:lang_other] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_1][0] %>)</td><td><%= @results_exit[:lang_other_1][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_2][0] %>)</td><td><%= @results_exit[:lang_other_2][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_3][0] %>)</td><td><%= @results_exit[:lang_other_3][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_4][0] %>)</td><td><%= @results_exit[:lang_other_4][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_5][0] %>)</td><td><%= @results_exit[:lang_other_5][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_6][0] %>)</td><td><%= @results_exit[:lang_other_6][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_7][0] %>)</td><td><%= @results_exit[:lang_other_7][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_8][0] %>)</td><td><%= @results_exit[:lang_other_8][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_9][0] %>)</td><td><%= @results_exit[:lang_other_9][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Other (<%= @results_exit[:lang_other_10][0] %>)</td><td><%= @results_exit[:lang_other_10][1] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Language other than English, Spanish, and languages listed in previous fields</td><td><%= @results_exit[:lang_other_extra] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:lang_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:lang_missing] %></td></tr>
+            
+            <tr><td colspan="2">Participation by age</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 10</td><td><%= @results_exit[:age_10] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 11</td><td><%= @results_exit[:age_11] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 12</td><td><%= @results_exit[:age_12] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 13</td><td><%= @results_exit[:age_13] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 14</td><td><%= @results_exit[:age_14] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 15</td><td><%= @results_exit[:age_15] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 16</td><td><%= @results_exit[:age_16] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 17</td><td><%= @results_exit[:age_17] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 18</td><td><%= @results_exit[:age_18] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 19</td><td><%= @results_exit[:age_19] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 20</td><td><%= @results_exit[:age_20] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Age 21</td><td><%= @results_exit[:age_21] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Respondents</td><td><%= @results_exit[:age_responses] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:age_missing] %></td></tr>
+                                                                    
+            <tr><td colspan="2">Participation by grade</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 5</td><td><%= @results_exit[:grade_5] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 6</td><td><%= @results_exit[:grade_6] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 7</td><td><%= @results_exit[:grade_7] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 8</td><td><%= @results_exit[:grade_8] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 9</td><td><%= @results_exit[:grade_9] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 10</td><td><%= @results_exit[:grade_10] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 11</td><td><%= @results_exit[:grade_11] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Grade 12</td><td><%= @results_exit[:grade_12] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Ungraded</td><td><%= @results_exit[:grade_ungraded] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Not In school / dropped out</td><td><%= @results_exit[:grade_dropout] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Working toward GED</td><td><%= @results_exit[:grade_getting_ged] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;HS grad / GED , no post-secondary</td><td><%= @results_exit[:grade_grad_nosec] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;HS grad / GED, in post-secondary</td><td><%= @results_exit[:grade_grad_sec] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;I am not currently enrolled in school</td><td><%= @results_exit[:grade_not_in] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total Respondents</td><td><%= @results_exit[:grade_total] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:grade_missing] %></td></tr>
+                                                           
+            <tr><td colspan="2">Totals by residence</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Living with family</td><td><%= @results_exit[:lives_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Foster care / living with family</td><td><%= @results_exit[:lives_foster_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Foster care / living in a group home</td><td><%= @results_exit[:lives_foster_group] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Couch surfing or moving from house to house</td><td><%= @results_exit[:lives_couch] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Outside/Tent city/Homeless camp/Car/Vehicle/Abandoned Building</td><td><%= @results_exit[:lives_outside] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Emergency shelter / transitional living program</td><td><%= @results_exit[:lives_shelter] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Hotel/Motel</td><td><%= @results_exit[:lives_hotel] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Juvenile detention / juvenile group home / probation officer</td><td><%= @results_exit[:lives_jail] %></td></tr>
+            <tr style="border-bottom: 3px solid black"><td>&nbsp;&nbsp;&nbsp;&nbsp;None of the above</td><td><%= @results_exit[:lives_none] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth living with family</td><td><%= @results_exit[:lives_totals_family] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth in foster care</td><td><%= @results_exit[:lives_totals_foster] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as runaway or homeless youth</td><td><%= @results_exit[:lives_totals_homeless] %></td></tr>
+            <tr style="border-bottom: 3px solid black"><td>&nbsp;&nbsp;&nbsp;&nbsp;Total marked as youth in adjudication system</td><td><%= @results_exit[:lives_totals_adjudicaton] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:lives_totals_any] %></td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:lives_totals_missing] %></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="apa">
+          <caption>Perceived Program Effects</caption>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th colspan="7">Frequencies</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Perceived Program Effects</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>                         
+              <td>8a. Resisted or said no to peer pressure</td>
+              <td><%= @results_exit[:impact_behavior_peer_much_more] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_some_more] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_same] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_some_less] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_much_less] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_missing] %></td>
+              <td><%= @results_exit[:impact_behavior_peer_totals] %></td>
+            </tr>
+            <tr>
+              <td>8b. Managed your emotions in healthy ways</td>
+              <td><%= @results_exit[:impact_behavior_emotion_much_more] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_some_more] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_same] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_some_less] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_much_less] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_missing] %></td>
+              <td><%= @results_exit[:impact_behavior_emotion_totals] %></td>
+            </tr>
+            <tr>
+              <td>8c. Made decisions to not use drugs and alcohol</td>
+              <td><%= @results_exit[:impact_behavior_alcohol_much_more] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_some_more] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_same] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_some_less] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_much_less] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_missing] %></td>
+              <td><%= @results_exit[:impact_behavior_alcohol_totals] %></td>
+            </tr>
+            <tr>
+              <td>8d. Thought about consequences</td>
+              <td><%= @results_exit[:impact_behavior_think_much_more] %></td>
+              <td><%= @results_exit[:impact_behavior_think_some_more] %></td>
+              <td><%= @results_exit[:impact_behavior_think_same] %></td>
+              <td><%= @results_exit[:impact_behavior_think_some_less] %></td>
+              <td><%= @results_exit[:impact_behavior_think_much_less] %></td>
+              <td><%= @results_exit[:impact_behavior_think_missing] %></td>
+              <td><%= @results_exit[:impact_behavior_think_totals] %></td>
+            </tr>
+            <tr>
+              <td>Perceived Program Effects</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>                         
+              <td>9a. Make plans to reach your goals</td>
+              <td><%= @results_exit[:impact_intent_plans_much_more] %></td>
+              <td><%= @results_exit[:impact_intent_plans_some_more] %></td>
+              <td><%= @results_exit[:impact_intent_plans_same] %></td>
+              <td><%= @results_exit[:impact_intent_plans_some_less] %></td>
+              <td><%= @results_exit[:impact_intent_plans_much_less] %></td>
+              <td><%= @results_exit[:impact_intent_plans_missing] %></td>
+              <td><%= @results_exit[:impact_intent_plans_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>9b. Care about doing well in school</td>
+              <td><%= @results_exit[:impact_intent_study_much_more] %></td>
+              <td><%= @results_exit[:impact_intent_study_some_more] %></td>
+              <td><%= @results_exit[:impact_intent_study_same] %></td>
+              <td><%= @results_exit[:impact_intent_study_some_less] %></td>
+              <td><%= @results_exit[:impact_intent_study_much_less] %></td>
+              <td><%= @results_exit[:impact_intent_study_missing] %></td>
+              <td><%= @results_exit[:impact_intent_study_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>9c. Graduate high school or get your GED</td>
+              <td><%= @results_exit[:impact_intent_graduate_much_more] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_some_more] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_same] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_some_less] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_much_less] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_missing] %></td>
+              <td><%= @results_exit[:impact_intent_graduate_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>9d. Get more education or training</td>
+              <td><%= @results_exit[:impact_intent_more_study_much_more] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_some_more] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_same] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_some_less] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_much_less] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_missing] %></td>
+              <td><%= @results_exit[:impact_intent_more_study_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>9e. Get a steady full-time job</td>
+              <td><%= @results_exit[:impact_intent_work_much_more] %></td>
+              <td><%= @results_exit[:impact_intent_work_some_more] %></td>
+              <td><%= @results_exit[:impact_intent_work_same] %></td>
+              <td><%= @results_exit[:impact_intent_work_some_less] %></td>
+              <td><%= @results_exit[:impact_intent_work_much_less] %></td>
+              <td><%= @results_exit[:impact_intent_work_missing] %></td>
+              <td><%= @results_exit[:impact_intent_work_totals] %></td>
+            </tr>
+            <tr>
+              <td>Perceived Program Effects</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>                         
+              <td>10a. Save money to get things you want</td>
+              <td><%= @results_exit[:impact_finance_save_much_more] %></td>
+              <td><%= @results_exit[:impact_finance_save_some_more] %></td>
+              <td><%= @results_exit[:impact_finance_save_same] %></td>
+              <td><%= @results_exit[:impact_finance_save_some_less] %></td>
+              <td><%= @results_exit[:impact_finance_save_much_less] %></td>
+              <td><%= @results_exit[:impact_finance_save_missing] %></td>
+              <td><%= @results_exit[:impact_finance_save_totals] %></td>
+            </tr>
+            <tr>
+              <td>10b. Confident about how to open a bank account</td>
+              <td><%= @results_exit[:impact_finance_bank_much_more] %></td>
+              <td><%= @results_exit[:impact_finance_bank_some_more] %></td>
+              <td><%= @results_exit[:impact_finance_bank_same] %></td>
+              <td><%= @results_exit[:impact_finance_bank_some_less] %></td>
+              <td><%= @results_exit[:impact_finance_bank_much_less] %></td>
+              <td><%= @results_exit[:impact_finance_bank_missing] %></td>
+              <td><%= @results_exit[:impact_finance_bank_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>10c. Confident about how to prepare a budget</td>
+              <td><%= @results_exit[:impact_finance_budget_much_more] %></td>
+              <td><%= @results_exit[:impact_finance_budget_some_more] %></td>
+              <td><%= @results_exit[:impact_finance_budget_same] %></td>
+              <td><%= @results_exit[:impact_finance_budget_some_less] %></td>
+              <td><%= @results_exit[:impact_finance_budget_much_less] %></td>
+              <td><%= @results_exit[:impact_finance_budget_missing] %></td>
+              <td><%= @results_exit[:impact_finance_budget_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>10d. Confident about how to track your expenses</td>
+              <td><%= @results_exit[:impact_finance_track_much_more] %></td>
+              <td><%= @results_exit[:impact_finance_track_some_more] %></td>
+              <td><%= @results_exit[:impact_finance_track_same] %></td>
+              <td><%= @results_exit[:impact_finance_track_some_less] %></td>
+              <td><%= @results_exit[:impact_finance_track_much_less] %></td>
+              <td><%= @results_exit[:impact_finance_track_missing] %></td>
+              <td><%= @results_exit[:impact_finance_track_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>10e. Understand cost associated with raising a child</td>
+              <td><%= @results_exit[:impact_finance_cost_much_more] %></td>
+              <td><%= @results_exit[:impact_finance_cost_some_more] %></td>
+              <td><%= @results_exit[:impact_finance_cost_same] %></td>
+              <td><%= @results_exit[:impact_finance_cost_some_less] %></td>
+              <td><%= @results_exit[:impact_finance_cost_much_less] %></td>
+              <td><%= @results_exit[:impact_finance_cost_missing] %></td>
+              <td><%= @results_exit[:impact_finance_cost_totals] %></td>
+            </tr>
+            <tr>
+              <td>Perceived Program Effects</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>                         
+              <td>11a. Talk about things going on in your life</td>
+              <td><%= @results_exit[:impact_talk_parent_much_more] %></td>
+              <td><%= @results_exit[:impact_talk_parent_some_more] %></td>
+              <td><%= @results_exit[:impact_talk_parent_same] %></td>
+              <td><%= @results_exit[:impact_talk_parent_some_less] %></td>
+              <td><%= @results_exit[:impact_talk_parent_much_less] %></td>
+              <td><%= @results_exit[:impact_talk_parent_missing] %></td>
+              <td><%= @results_exit[:impact_talk_parent_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>11b. Talk about sex</td>
+              <td><%= @results_exit[:impact_talk_other_much_more] %></td>
+              <td><%= @results_exit[:impact_talk_other_some_more] %></td>
+              <td><%= @results_exit[:impact_talk_other_same] %></td>
+              <td><%= @results_exit[:impact_talk_other_some_less] %></td>
+              <td><%= @results_exit[:impact_talk_other_much_less] %></td>
+              <td><%= @results_exit[:impact_talk_other_missing] %></td>
+              <td><%= @results_exit[:impact_talk_other_totals] %></td>
+            </tr>
+            <tr>
+              <td>Perceived Program Effects</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>                         
+              <td>12a. Understand what makes a relationship healthy</td>
+              <td><%= @results_exit[:impact_relate_healthy_much_more] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_some_more] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_same] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_some_less] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_much_less] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_missing] %></td>
+              <td><%= @results_exit[:impact_relate_healthy_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>12b. Say no to someone </td>
+              <td><%= @results_exit[:impact_relate_resist_much_more] %></td>
+              <td><%= @results_exit[:impact_relate_resist_some_more] %></td>
+              <td><%= @results_exit[:impact_relate_resist_same] %></td>
+              <td><%= @results_exit[:impact_relate_resist_some_less] %></td>
+              <td><%= @results_exit[:impact_relate_resist_much_less] %></td>
+              <td><%= @results_exit[:impact_relate_resist_missing] %></td>
+              <td><%= @results_exit[:impact_relate_resist_totals] %></td>
+            </tr>
+            <tr>                         
+              <td>12c. Talk to a trusted person/adult</td>
+              <td><%= @results_exit[:impact_relate_talk_much_more] %></td>
+              <td><%= @results_exit[:impact_relate_talk_some_more] %></td>
+              <td><%= @results_exit[:impact_relate_talk_same] %></td>
+              <td><%= @results_exit[:impact_relate_talk_some_less] %></td>
+              <td><%= @results_exit[:impact_relate_talk_much_less] %></td>
+              <td><%= @results_exit[:impact_relate_talk_missing] %></td>
+              <td><%= @results_exit[:impact_relate_talk_totals] %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <table class="apa">
+          <caption>Responses to Programs</caption>
+          <thead>
+            <tr>
+              <th colspan="2">Item</th>
+              <th colspan="9">Frequencies</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="11">13. Abstain from sexual Intercourse</td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;Yes</td><td><%= @results_exit[:plan_abstainsex_yes] %></td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;No</td><td><%= @results_exit[:plan_abstainsex_no] %></td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;Not sure</td><td><%= @results_exit[:plan_abstainsex_unsure] %></td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;Missing</td><td><%= @results_exit[:plan_abstainsex_missing] %></td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;Total middle school version</td><td><%= @results_exit[:plan_abstainsex_middle] %></td></tr>
+            <tr><td colspan="10">&nbsp;&nbsp;&nbsp;&nbsp;Total respondents</td><td><%= @results_exit[:plan_abstainsex_totals] %></td></tr>
+            <tr>
+              <td colspan="3">Response to program</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not at all important</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not too important</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat important</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Very important</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total middle school version</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Skipped because not applicable</td>
+            </tr>
+            <tr>
+              <td colspan="3">14a. How it might affect your plans for the future</td>
+              <td><%= @results_exit[:abstain_yes_plans_not_any] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_not_too_much] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_somewhat] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_very] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_missing] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_middle] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_totals] %></td>
+              <td><%= @results_exit[:abstain_yes_plans_skipped] %></td>
+            </tr>
+            <tr>
+              <td colspan="3">14b. The possible emotional/social consequences</td>
+              <td><%= @results_exit[:abstain_yes_consequences_not_any] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_not_too_much] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_somewhat] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_very] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_missing] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_middle] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_totals] %></td>
+              <td><%= @results_exit[:abstain_yes_consequences_skipped] %></td>
+            </tr>
+            <tr>
+              <td colspan="3">14c. The risk of getting a STI</td>
+              <td><%= @results_exit[:abstain_yes_sti_not_any] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_not_too_much] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_somewhat] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_very] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_missing] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_middle] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_totals] %></td>
+              <td><%= @results_exit[:abstain_yes_sti_skipped] %></td>
+            </tr>
+            <tr>
+              <td colspan="3">14d. The risk of getting pregnant or getting someone pregnant</td>
+              <td><%= @results_exit[:abstain_yes_preg_not_any] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_not_too_much] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_somewhat] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_very] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_missing] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_middle] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_totals] %></td>
+              <td><%= @results_exit[:abstain_yes_preg_skipped] %></td>
+            </tr>
+            <tr>
+              <td>Response to program</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">This question does not apply</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat more likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">About the same</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Much less likely</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total middle school version</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Skipped because not applicable</td>
+            </tr>
+            <tr>
+              <td>15a. Have sexual intercourse in next 3 months</td>
+              <td style="background-color: black"></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_much_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_some_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_same] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_some_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_much_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_missing] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_middle] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_totals] %></td>
+              <td><%= @results_exit[:abstain_notyes_havesex_skipped] %></td>
+            </tr>
+            <tr>
+              <td>15b. Use a condom in next 3 months</td>
+              <td><%= @results_exit[:abstain_notyes_condom_not_applicable] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_much_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_some_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_same] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_some_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_much_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_missing] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_middle] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_totals] %></td>
+              <td><%= @results_exit[:abstain_notyes_condom_skipped] %></td>
+            </tr>
+            <tr>
+              <td>15c. Use birth control in next 3 months</td>
+              <td><%= @results_exit[:abstain_notyes_contra_not_applicable] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_much_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_some_more] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_same] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_some_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_much_less] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_missing] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_middle] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_totals] %></td>
+              <td><%= @results_exit[:abstain_notyes_contra_skipped] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">Response to program</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">All of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Most of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Some of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">None of the time</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td colspan="5">16a. Interested in program sessions/classes</td>
+              <td><%= @results_exit[:percep_interest_all] %></td>
+              <td><%= @results_exit[:percep_interest_most] %></td>
+              <td><%= @results_exit[:percep_interest_some] %></td>
+              <td><%= @results_exit[:percep_interest_none] %></td>
+              <td><%= @results_exit[:percep_interest_missing] %></td>
+              <td><%= @results_exit[:percep_interest_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">16b. Felt material was clear</td>
+              <td><%= @results_exit[:percep_clear_all] %></td>
+              <td><%= @results_exit[:percep_clear_most] %></td>
+              <td><%= @results_exit[:percep_clear_some] %></td>
+              <td><%= @results_exit[:percep_clear_none] %></td>
+              <td><%= @results_exit[:percep_clear_missing] %></td>
+              <td><%= @results_exit[:percep_clear_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">16c. Discussions/activities helped learn lessons</td>
+              <td><%= @results_exit[:percep_learn_all] %></td>
+              <td><%= @results_exit[:percep_learn_most] %></td>
+              <td><%= @results_exit[:percep_learn_some] %></td>
+              <td><%= @results_exit[:percep_learn_none] %></td>
+              <td><%= @results_exit[:percep_learn_missing] %></td>
+              <td><%= @results_exit[:percep_learn_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">16d. Chance to ask questions about topics/issues</td>
+              <td><%= @results_exit[:percep_ask_all] %></td>
+              <td><%= @results_exit[:percep_ask_most] %></td>
+              <td><%= @results_exit[:percep_ask_some] %></td>
+              <td><%= @results_exit[:percep_ask_none] %></td>
+              <td><%= @results_exit[:percep_ask_missing] %></td>
+              <td><%= @results_exit[:percep_ask_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">16e. Felt respected as a person</td>
+              <td><%= @results_exit[:percep_respect_all] %></td>
+              <td><%= @results_exit[:percep_respect_most] %></td>
+              <td><%= @results_exit[:percep_respect_some] %></td>
+              <td><%= @results_exit[:percep_respect_none] %></td>
+              <td><%= @results_exit[:percep_respect_missing] %></td>
+              <td><%= @results_exit[:percep_respect_totals] %></td>
+            </tr>
+            <tr>
+              <td colspan="5">Response to program</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Very satisfied</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Somewhat satisfied</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">A little satisfied</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Not at all satisfied</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Missing</td>
+              <td style="writing-mode: vertical-rl; transform: rotate(180deg)">Total Respondents</td>
+            </tr>
+            <tr>
+              <td colspan="5">17a. Information received about abstaining from sex</td>
+              <td><%= @results_exit[:satisfaction_abstain_very] %></td>
+              <td><%= @results_exit[:satisfaction_abstain_somewhat] %></td>
+              <td><%= @results_exit[:satisfaction_abstain_little] %></td>
+              <td><%= @results_exit[:satisfaction_abstain_notatall] %></td>
+              <td><%= @results_exit[:satisfaction_abstain_missing] %></td>
+              <td><%= @results_exit[:satisfaction_abstain_totals] %></td>
+            </tr>
+            <tr>                     
+              <td colspan="5">17b. Information about condoms and birth control</td>
+              <td><%= @results_exit[:satisfaction_contra_very] %></td>
+              <td><%= @results_exit[:satisfaction_contra_somewhat] %></td>
+              <td><%= @results_exit[:satisfaction_contra_little] %></td>
+              <td><%= @results_exit[:satisfaction_contra_notatall] %></td>
+              <td><%= @results_exit[:satisfaction_contra_missing] %></td>
+              <td><%= @results_exit[:satisfaction_contra_totals] %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+<% end %>

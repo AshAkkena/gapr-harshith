@@ -1,0 +1,41 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Staff Training Surveys</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Affiliation</th>
+      <th>Quality interest</th>
+      <th>Quality relevance</th>
+      <th>Quality will use</th>
+      <th>Quality will share</th>
+      <th>Quality will recommend</th>
+      <th>Details good</th>
+      <th>Details improvement</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @staff_training_surveys.each do |staff_training_survey| %>
+      <tr>
+        <td><%= staff_training_survey.affiliation %></td>
+        <td><%= staff_training_survey.quality_interest %></td>
+        <td><%= staff_training_survey.quality_relevance %></td>
+        <td><%= staff_training_survey.quality_will_use %></td>
+        <td><%= staff_training_survey.quality_will_share %></td>
+        <td><%= staff_training_survey.quality_will_recommend %></td>
+        <td><%= staff_training_survey.details_good %></td>
+        <td><%= staff_training_survey.details_improvement %></td>
+        <td><%= link_to 'Show', staff_training_survey %></td>
+        <td><%= link_to 'Edit', edit_staff_training_survey_path(staff_training_survey) %></td>
+        <td><%= link_to 'Destroy', staff_training_survey, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Staff Training Survey', new_staff_training_survey_path %>

@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Affiliation:</strong>
+  <%= @staff_training_survey.affiliation %>
+</p>
+
+<p>
+  <strong>Quality interest:</strong>
+  <%= @staff_training_survey.quality_interest %>
+</p>
+
+<p>
+  <strong>Quality relevance:</strong>
+  <%= @staff_training_survey.quality_relevance %>
+</p>
+
+<p>
+  <strong>Quality will use:</strong>
+  <%= @staff_training_survey.quality_will_use %>
+</p>
+
+<p>
+  <strong>Quality will share:</strong>
+  <%= @staff_training_survey.quality_will_share %>
+</p>
+
+<p>
+  <strong>Quality will recommend:</strong>
+  <%= @staff_training_survey.quality_will_recommend %>
+</p>
+
+<p>
+  <strong>Details good:</strong>
+  <%= @staff_training_survey.details_good %>
+</p>
+
+<p>
+  <strong>Details improvement:</strong>
+  <%= @staff_training_survey.details_improvement %>
+</p>
+
+<%= link_to 'Edit', edit_staff_training_survey_path(@staff_training_survey) %> |
+<%= link_to 'Back', staff_training_surveys_path %>

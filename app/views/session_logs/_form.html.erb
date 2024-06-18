@@ -1,0 +1,185 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    $(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+
+<%= form_with(model: session_log, local: true) do |form| %>
+  <% if session_log.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(session_log.errors.count, "error") %> prohibited this session_log from being saved:</h2>
+
+      <ul>
+        <% session_log.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year, hidden: true %>
+  </div>
+
+  <h2>Were surveys taken?</h2>
+  <div class="field">
+    <%= form.check_box :did_entry_survey %>
+    <%= form.label :did_entry_survey %>
+  </div>
+  
+  <div class="field">
+    <%= form.check_box :did_exit_survey %>
+    <%= form.label :did_exit_survey %>
+  </div>
+
+  <h2>What was taught?</h2>
+  <div class="field">
+    <%= form.collection_check_boxes :module_lookup_ids, @modules, :id, :fancy_name do |b| %>
+      <%= b.check_box %>
+      <%= b.label %>
+      <br />
+    <% end %>
+  </div>
+
+  <h2>When and How Long?</h2>
+
+  <div class="field">
+    <%= form.text_field :magic_code, readonly: true, hidden: true %>
+  </div>
+
+  <div class="field">
+    <%= form.text_field :cohort_id, readonly: true, hidden: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :happened_on, 'Session Date (YYYY-MM-DD):' %>
+    <%= form.text_field :happened_on, required: true, class: "datepicker" %>
+  </div>
+  
+  <div class="field">
+    <%= form.label :minutes_taught %>
+    <%= form.number_field :minutes_taught, required: true, min: 0 %>
+  </div>
+
+  <% if @cohort.uses_enrollment %>
+    <h2>Who was there?</h2>
+    <div class="field">
+      <%= form.collection_check_boxes :enrollment_ids, @enrollments, :id, :quick_name do |c| %>
+        <%= c.check_box %>
+        <%= c.label %>
+        <br />
+      <% end %>
+    </div>
+    <p><%= link_to("Add More",(Prep::Constants::Enroll + Base64.strict_encode64({contractor: session_log.cohort.provider.long_name, cohort: session_log.cohort.name + " (" + session_log.cohort.extra_name + ")", curriculum: session_log.cohort.curriculum_choice, magic: session_log.cohort.coho_up.magic_code, contacts: (User.with_role(:site_admin, session_log.cohort.provider).pluck(:email) * ", ")}.to_json))) %></p>
+  <% else %>
+    <h2>How many?</h2>
+    <table class="apa">
+      <tr>
+        <th>Age Group</th>
+        <th>How many total?</th>
+        <th>Of these, how many were new?</th>
+      </tr>
+      <tr>
+        <td>
+          <%= form.label :middleschool %>
+        </td>
+        <td>
+          <div class="field">
+            <%= form.number_field :middleschool_headcount, required: true, min: 0, size: 2  %>
+          </div>
+        </td>
+        <td>
+          <div class="field">
+            <%= form.number_field :newface_ms_headcount, required: true, min: 0, size: 2  %>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <%= form.label :highschool %>
+        </td>
+        <td>
+          <div class="field">
+            <%= form.number_field :highschool_headcount, required: true, min: 0, size: 2  %>
+          </div>
+        </td>
+        <td>
+          <div class="field">
+            <%= form.number_field :newface_hs_headcount, required: true, min: 0, size: 2  %>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p><i>Note: &quot;New&quot; means new to GaPR, not necessarily a walk-in registration or the like.<br />
+    If it's a participant's first time counting towards the total, then they also count towards being &quot;new.&quot;</i><br /></p>
+  <% end %>
+
+  <h2>How did it go?</h2>
+  
+  <div class="field">
+    <%= form.label :participantion_proportion %>
+    <%= form.select :participantion_proportion, ['Most participated', 'Some participated', 'Few participated'], prompt: 'Select one', required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :interest_proportion %>
+    <%= form.select :interest_proportion, ['Most were interested', 'Some were interested', 'Few were interested'], prompt: 'Select one', required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :enough_time %>
+    <%= form.select :enough_time, ['There was enough time', 'There was almost enough time', 'There was not enough time'], prompt: 'Select one', required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :taught_everything %>
+    <%= form.check_box :taught_everything %>
+  </div>
+
+  <div class="field">
+    <%= form.label :adapted_anything %>
+    <%= form.check_box :adapted_anything %>
+  </div>
+
+  <div class="field">
+    <%= form.label :participant_referal %>
+    <%= form.check_box :participant_referal %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impl_setting %>
+    <%= form.select :impl_setting, ['In School, during school', 'In School, after school', 'Community-Based Organization', 'Clinic', 'Foster Care Setting', 'Juvenile Detention Setting', 'Residential Mental Health Treatment Facility', 'Virtual', 'Other'], prompt: 'Select one', required: true %>
+  </div>
+
+  <h2>Receipts</h2>
+  <p>Attach a file that documents this session's attendance. A copy of the Excel spreadsheet you use to take attendance, a PDF, even a picture of your gradebook from your phone, any format is acceptable!<br />To protect participant privacy, you <i>will not</i> be able to download a copy of this file using this interface.</p>
+  <% if session_log.receipt.attached? %>
+    <% if session_log[:id].nil? %>
+      <p>You had selected a receipt, but we need you to select it again. We're working on improving this, sorry!</p>
+      <%= form.file_field :receipt %>
+    <% else %>
+      <p>A receipt is attached. <%= link_to 'Delete Receipt', delete_receipt_session_log_path(session_log.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %></p>
+    <% end %>
+  <% else %>
+    <div class="field">
+      <%= form.file_field :receipt %>
+    </div>  
+  <% end %>
+  
+  <h2>Sign-Off and Submit</h2>
+  <div class="field">
+    <%= form.label :facilitator_initial %>
+    <%= form.text_field :facilitator_initial, required: true %>
+  </div>
+
+  <%= flash[:recaptcha_error] %>
+  <%= recaptcha_tags %>
+  
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

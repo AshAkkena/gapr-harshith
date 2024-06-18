@@ -1,0 +1,97 @@
+<p id="notice"><%= notice %></p>
+<h1>Session Logs for Active Cohorts</h1>
+<% @providers.order(:pmms_aggregate_name).each do |provider| %>
+  <h2><%= provider.long_name + " (" + provider.period.to_s + ")" %></h2>
+  <% @active_cohorts.where(provider_id: provider.id).order(:name).each do |active_cohort| %>
+    <table class="apa">
+      <caption><%= active_cohort.name %> (<%= active_cohort.extra_name %>)</caption>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Length</th>
+          <th colspan="2">
+            <div style="margin-left: 5px; margin-right: 5px">
+              <div class="row">
+                <div style="margin: auto; border-bottom: 1px solid black">N&lt;18</div>
+              </div>
+              <div class="row">
+                <div class="col">Total</div>
+                <div class="col">(New)</div>
+              </div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div style="margin-left: 5px; margin-right: 5px">
+              <div class="row">
+                <div style="margin: auto; border-bottom: 1px solid black">N&GreaterEqual;18</div>
+              </div>
+              <div class="row">
+                <div class="col">Total</div>
+                <div class="col">(New)</div>
+              </div>
+            </div>
+          </th>
+          <th>Lessons</th>
+          <th>Facilitator</th>
+          <th>Receipt</th>
+          <th colspan="3"></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @session_logs.where(cohort_id: active_cohort.id).order(:happened_on).each do |session_log| %>
+        <tr>
+          <td><%= session_log.happened_on %></td>
+          <td><%= session_log.minutes_taught %></td>
+          <td><%= session_log.middleschool_headcount %></td>
+          <td><%= session_log.newface_ms_headcount %></td>          
+          <td><%= session_log.highschool_headcount %></td>
+          <td><%= session_log.newface_hs_headcount %></td>
+          <td>
+          <% if session_log.module_lookups.present? %>
+            <% session_log.module_lookups.each do |taught| %>
+              <%= taught.abbreviated_curriculum %> <%= taught.delivery_sequence %><%= taught != session_log.module_lookups.last ? ", " : "" %>
+            <% end %>
+          <% else %>
+            <i>(None)</i>
+          <% end %>
+          </td>
+          <td><%= session_log.facilitator_initial %></td>
+          <td>
+            <% if session_log.receipt.attached? %>
+              <input type="checkbox" checked="checked" id="checkboxr<% session_log.id %>" name="checkboxr<% session_log.id %>" value="1" disabled="true">
+              <% if signed_in? %>
+                <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:site_admin, session_log.cohort.provider) %>
+                  <%= link_to '(Get)', rails_storage_proxy_path(session_log.receipt, disposition: "attachment" ) %>
+                  <%= link_to '(Del)', delete_receipt_session_log_path(session_log.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <input type="checkbox" id="checkboxr<% session_log.id %>" name="checkboxr<% session_log.id %>" value="0" disabled="true">
+            <% end %>
+          </td>
+          <td><%= link_to 'Show', session_log %></td>
+          <td><%= link_to 'Edit', edit_session_log_path(session_log) %></td>
+          <td><%= link_to 'Destroy', session_log, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        </tr>      
+      <% end %>
+      <tr style="border-top: 1px solid black; border-bottom: 1px solid white; background-color: white">
+        <td>Total:</td>
+        <td>~<%= @session_logs.where(cohort_id: active_cohort.id).order(:happened_on).pluck(:minutes_taught).sum / 60 %>h</td>
+        <td></td>
+        <td><%= @session_logs.where(cohort_id: active_cohort.id).order(:happened_on).pluck(:newface_ms_headcount).sum %></td>
+        <td></td>
+        <td><%= @session_logs.where(cohort_id: active_cohort.id).order(:happened_on).pluck(:newface_hs_headcount).sum %></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      </tbody>
+    </table>
+    <%= link_to 'Add', new_session_log_path(magic_code: active_cohort.coho_up.magic_code) %>
+  <% end %>
+  
+<% end %>
+
+
+<br>

@@ -1,0 +1,177 @@
+<%= form_with(model: grantee) do |form| %>
+  <% if grantee.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(grantee.errors.count, "error") %> prohibited this grantee from being saved:</h2>
+
+      <ul>
+        <% grantee.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :period %>
+    <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year %>
+  </div>
+
+  <div class="field">
+    <%= form.label :covid_interrupt_admin %>
+    <%= form.check_box :covid_interrupt_admin %>
+  </div>
+
+  <div class="field">
+    <%= form.label :covid_interrupt_service %>
+    <%= form.check_box :covid_interrupt_service %>
+  </div>
+
+  <div class="field">
+    <%= form.label :total_grantee_award %>
+    <%= form.number_field :total_grantee_award %>
+  </div>
+
+  <div class="field">
+    <%= form.label :allocation_direct_service %>
+    <%= form.number_field :allocation_direct_service %>
+  </div>
+
+  <div class="field">
+    <%= form.label :allocation_training %>
+    <%= form.number_field :allocation_training %>
+  </div>
+
+  <div class="field">
+    <%= form.label :allocation_evaluation %>
+    <%= form.number_field :allocation_evaluation %>
+  </div>
+
+  <div class="field">
+    <%= form.label :allocation_administrative %>
+    <%= form.number_field :allocation_administrative %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_overseeing %>
+    <%= form.number_field :staffing_overseeing %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_covid_vacancies_ever %>
+    <%= form.number_field :staffing_covid_vacancies_ever %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_covid_vacancies_filled %>
+    <%= form.number_field :staffing_covid_vacancies_filled %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_fte_overseeing %>
+    <%= form.number_field :staffing_fte_overseeing %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_fte_covid_vacancies_ever %>
+    <%= form.number_field :staffing_fte_covid_vacancies_ever %>
+  </div>
+
+  <div class="field">
+    <%= form.label :staffing_fte_covid_vacancies_filled %>
+    <%= form.number_field :staffing_fte_covid_vacancies_filled %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observed_delivery %>
+    <%= form.check_box :observed_delivery %>
+  </div>
+
+  <div class="field">
+    <%= form.label :conducted_training %>
+    <%= form.check_box :conducted_training %>
+  </div>
+
+  <div class="field">
+    <%= form.label :provided_tta %>
+    <%= form.check_box :provided_tta %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observers_grantee %>
+    <%= form.check_box :observers_grantee %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observers_developer %>
+    <%= form.check_box :observers_developer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observers_tta_partner %>
+    <%= form.check_box :observers_tta_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observers_eval_partner %>
+    <%= form.check_box :observers_eval_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :observers_prog_provider %>
+    <%= form.check_box :observers_prog_provider %>
+  </div>
+
+  <div class="field">
+    <%= form.label :facil_trainers_grantee %>
+    <%= form.check_box :facil_trainers_grantee %>
+  </div>
+
+  <div class="field">
+    <%= form.label :facil_trainers_developer %>
+    <%= form.check_box :facil_trainers_developer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :facil_trainers_tta_partner %>
+    <%= form.check_box :facil_trainers_tta_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :facil_trainers_eval_partner %>
+    <%= form.check_box :facil_trainers_eval_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :facil_trainers_prog_provider %>
+    <%= form.check_box :facil_trainers_prog_provider %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tta_providers_grantee %>
+    <%= form.check_box :tta_providers_grantee %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tta_providers_developer %>
+    <%= form.check_box :tta_providers_developer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tta_providers_tta_partner %>
+    <%= form.check_box :tta_providers_tta_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tta_providers_eval_partner %>
+    <%= form.check_box :tta_providers_eval_partner %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tta_providers_prog_provider %>
+    <%= form.check_box :tta_providers_prog_provider %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

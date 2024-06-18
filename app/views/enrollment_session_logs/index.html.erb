@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Enrollment Session Logs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Enrollment</th>
+      <th>Session log</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @enrollment_session_logs.each do |enrollment_session_log| %>
+      <tr>
+        <td><%= enrollment_session_log.enrollment_id %></td>
+        <td><%= enrollment_session_log.session_log_id %></td>
+        <td><%= link_to 'Show', enrollment_session_log %></td>
+        <td><%= link_to 'Edit', edit_enrollment_session_log_path(enrollment_session_log) %></td>
+        <td><%= link_to 'Destroy', enrollment_session_log, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Enrollment Session Log', new_enrollment_session_log_path %>

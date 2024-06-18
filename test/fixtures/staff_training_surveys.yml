@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  affiliation: MyString
+  quality_interest: 1
+  quality_relevance: 1
+  quality_will_use: 1
+  quality_will_share: 1
+  quality_will_recommend: 1
+  details_good: MyText
+  details_improvement: MyText
+
+two:
+  affiliation: MyString
+  quality_interest: 1
+  quality_relevance: 1
+  quality_will_use: 1
+  quality_will_share: 1
+  quality_will_recommend: 1
+  details_good: MyText
+  details_improvement: MyText

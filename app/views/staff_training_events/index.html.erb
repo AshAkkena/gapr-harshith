@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Staff Training Events</h1>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Training name</th>
+      <th>Training date</th>
+      <th>Responses</th>
+      <th>Link to Take</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @staff_training_events.each do |staff_training_event| %>
+      <tr>
+        <td><%= staff_training_event.training_name %></td>
+        <td><%= staff_training_event.training_date %></td>
+        <td><%= staff_training_event.staff_training_surveys.length %></td>
+        <td><%= link_to 'Take Survey', new_staff_training_survey_path(lookup: staff_training_event.lookup) %></td>
+        <td><%= link_to 'Show', staff_training_event %></td>
+        <td><%= link_to 'Edit', edit_staff_training_event_path(staff_training_event) %></td>
+        <td><%= link_to 'Destroy', staff_training_event, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Staff Training Event', new_staff_training_event_path %>

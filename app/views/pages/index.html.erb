@@ -1,0 +1,107 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+      // Plain JS
+      const element = document.querySelector('.plainJStest');
+      const colors = ['orange', 'blue', 'red', 'green']; // The colors you want
+      const colorDuration = 500; // The duration of a color in milliseconds
+      let colorIndex = 0;
+
+      function switchColor() {
+          element.style.color = colors[colorIndex++ % colors.length];
+      }
+      switchColor();
+      setInterval(switchColor, colorDuration);
+      
+      
+      // Plain jquery
+      $('.rainbow').each(function(i) {
+        $(this).addClass('rainbow-' + i).rainbow({
+          colors: phase([
+            '#FF0000',
+            '#f26522',
+            '#fff200',
+            '#00a651',
+            '#28abe2',
+            '#2e3192',
+            '#6868ff'
+          ], i + 1),
+          animate: true,
+          animateInterval: 100,
+          pad: false,
+          pauseLength: 100
+        });
+      });
+      // jquery-ui
+      $('#calendarField').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    $(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+
+<div class="jumbotron">
+<div class="container-fluid">
+	<h1>Georgia Performance Measures Management System Recordkeeping</h1>
+  <hr />
+  <h2>Welcome</h2>
+  <p>Welcome to Georgia Performance Measures Management System Recordkeeping (GaPR). On this site, you will be able to enter information about your PREP implementation(s)</p>
+	<p>These data are pursuant to the completion of federally-required performance measures reporting. It is the goal of the Evaluation Team to:</p>
+	<ul>
+	  <li>Protect confidentiality</li>
+	  <li>Collect required data</li>
+	  <li>Respect your time</li>
+	</ul>
+</div>
+<% if signed_in? %>
+  <div class="container-fluid">
+  <h2>Your Access<h2>
+    <% if current_user.has_role?(:technician) %>
+      <p style="color:red">You are a technician.</p>
+    <% end %>
+    <% if current_user.has_role?(:state_coordinator) %>
+      <p>You are listed as a state coordinator.</p>
+    <% end %>
+    <p>You are listed as a <i>Site Administrator</i> for the following providers: <ul>
+    <% if current_user.has_role?(:site_admin, :any) %>
+      <% Provider.with_role(:site_admin, current_user).each do |provider| %>
+        <li><%= provider.long_name + ' (' + provider.period.to_s + ')' %></li>
+      <% end %>
+    <% else %>
+      <i>(None)</i>
+    <% end %>
+    </ul>
+    </p>
+    <p>You are listed as a <i>Facilitator</i> for the following providers: <ul>
+    <% if current_user.has_role?(:facilitator, :any) %>
+      <% Provider.with_role(:facilitator, current_user).each do |provider| %>
+        <li><%= provider.long_name + ' (' + provider.period.to_s + ')'  %></li>
+      <% end %>
+    <% else %>
+      <i>(None)</i>
+    <% end %>
+    </ul>
+    </p>
+    <p>If your access should be different, please <a href="mailto:prepeval@gsu.edu?subject=[PREP] GaPR Permissions">contact us</a>!</p>
+  </div>
+<% else %>
+  <div class="container">
+    <h2>Quick Tests</h2>
+    <p>Below are little tests of three systems that this tool uses to help you.</p>
+    <p>Javascript: <span class="plainJStest">the color of this text should be changing</span>.</p>
+    <p>Style: The text input field <i>should</i> have a calendar appear when you click inside it:<input type='text' id='calendarField' /></p>
+    <p>UI: Finally, the button below should have a dropdown menu appear.
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Dropdown button
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Great,</a></li>
+        <li><a class="dropdown-item" href="#">It works!</a></li>
+        <li><a class="dropdown-item" href="#">You're ready to go.</a></li>
+      </ul>
+    </div>
+    </p>
+    <p> If any of them do not work, then you may want to try using a different browser and/or device. If you can find no way to view this site such that all options work, please contact us. We want to help!</p>
+  </div>
+<% end %>

@@ -1,0 +1,2 @@
+json.extract! session_log, :id, :period, :magic_code, :cohort_id, :happened_on, :minutes_taught, :middleschool_headcount, :highschool_headcount, :newface_ms_headcount, :newface_hs_headcount, :facilitator_initial, :participantion_proportion, :interest_proportion, :enough_time, :taught_everything, :adapted_anything, :participant_referal, :impl_setting, :created_at, :updated_at
+json.url session_log_url(session_log, format: :json)

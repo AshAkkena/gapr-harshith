@@ -1,0 +1,159 @@
+<%= form_with(model: staff_training_survey) do |form| %>
+  <% if staff_training_survey.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(staff_training_survey.errors.count, "error") %> prohibited this staff_training_survey from being saved:</h2>
+
+      <ul>
+        <% staff_training_survey.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <h2><%= @staff_training_event.training_name.to_s %></h2>
+      <div class="field">
+        <%= form.text_field :staff_training_event_id, hidden: true %>
+      </div>
+      <div class="field" style="margin: auto; text-align: center">
+        <%= form.label :affiliation %><br />
+        <%= form.select :affiliation, ['AHYD', 'CBO', 'Other' ], prompt: 'Select one', required: true %>
+      </div>
+      How much do you agree with the following statements?
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-7">
+            Statement
+          </div>
+          <div class="col-1">
+            Strongly<br />Disagree
+          </div>
+          <div class="col-1">
+            Disagree
+          </div>
+          <div class="col-1">
+            Neutral
+          </div>
+          <div class="col-1">
+            Agree
+          </div>
+          <div class="col-1">
+            Strongly<br />Agree
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <%= form.label :quality_interest %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_interest, 1 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_interest, 2 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_interest, 3 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_interest, 4 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_interest, 5 %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <%= form.label :quality_relevance %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_relevance, 1 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_relevance, 2 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_relevance, 3 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_relevance, 4 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_relevance, 5 %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <%= form.label :quality_will_use %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_use, 1 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_use, 2 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_use, 3 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_use, 4 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_use, 5 %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <%= form.label :quality_will_share %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_share, 1 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_share, 2 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_share, 3 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_share, 4 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_share, 5 %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-7">
+            <%= form.label :quality_will_recommend %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_recommend, 1 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_recommend, 2 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_recommend, 3 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_recommend, 4 %>
+          </div>
+          <div class="col">
+            <%= form.radio_button :quality_will_recommend, 5 %>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" style="margin: auto; text-align: center">
+        <%= form.label :details_good %><br />
+        <%= form.text_area :details_good %>
+      </div>
+
+      <div class="field" style="margin: auto; text-align: center">
+        <%= form.label :details_improvement %><br />
+        <%= form.text_area :details_improvement %>
+      </div>
+      
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,363 @@
+<% content_for :header do %>
+  <script>
+    var readyFancyLink = function() {
+      $(".fancyLink").on('click', function(i) {
+        i.preventDefault();
+        var copyText = $(this).attr('href');
+        navigator.clipboard.writeText(copyText);
+        $(this).fadeOut(500, function() {
+          $(this).html('Copied!').fadeIn(500, function() {
+            $(this).fadeOut(500, function() {
+              $(this).html('Copy Link').fadeIn(500);
+            })
+          });
+        })
+      })
+    }
+    $(document).ready(readyFancyLink);
+    //$(document).on('turbolinks:load', readyFancyLink); 
+  </script>
+<% end %>
+
+<br />
+<%= link_to 'New Cohort', new_cohort_path, class: "btn btn-success btn-large", style: "color: white" %>
+<br />
+<% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, :any) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:facilitator, :any) or current_user.has_role?(:vicar) %>
+  <p>WIP: <%= link_to 'Outcomes Dashboard: Activities', outcomes_dashboard_activities_path %></p>
+<% end %> 
+
+<p id="notice"><%= notice %></p>
+
+<p>A <i>cohort</i> is a group of participants that receive PREP programming together. Cohorts generally begin as <i>drafts</i>, then become <i>active</i>. At the end of a cohort, if it completted all programming, it is finalized as a <i>finished</i> cohort, but if it did not complete programming, then it is finalized as a <i>closed</i> cohort.</p>
+<% if @stale_cohorts.present? %>
+  <% if @stale_cohorts.length > 0 %>
+    <h1>Potentially Finished Cohorts</h1>
+    <p>These cohorts were activated with an intended finish date of more than a week ago, but are not closed.<br />Please review and contact us if there appears to be anything wrong with this information.</p>
+    <table class="apa">
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th colspan="3">Name</th>
+          <th>Intended Finish</th>
+          <th>Sessions Logged</th>
+          <th>Enrollment</th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Survey Counts</div></div>
+            <div class="row">
+              <div class="col">Entry</div>
+              <div class="col">Exit</div>
+            </div>
+          </th>
+          <th colspan="3">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Helpers</div></div>
+            <div class="row">
+              <div class="col">Log</div>
+              <div class="col">Survey</div>
+              <div class="col">Enroll</div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Survey Links</div></div>
+            <div class="row">
+              <div class="col">Entry</div>
+              <div class="col">Exit</div>
+            </div>
+          </th>
+          <th colspan="3" style="text-align: center">Tools</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stale_cohorts.each do |cohort| %>
+          <tr>
+            <td><%= cohort.provider.period %></td>
+            <td><%= cohort.provider.long_name %></td>
+            <td><%= cohort.name %></td>
+            <td><%= cohort.extra_name %></td>
+            <td><%= cohort.intended_finish.strftime("%b %-d %y") %></td>
+            </td>
+            <td>
+              <%= cohort.session_logs.length.to_s %>/<%= cohort.intended_session_count.to_s %> 
+              <% if current_user.has_role?(:facilitator, cohort.provider) or current_user.has_role?(:technician) %>
+                <%= link_to '+', new_session_log_url(magic_code: cohort.coho_up.magic_code) %>
+              <% end %>
+            </td>
+            <td><%= cohort.uses_enrollment? ? cohort.enrollments.where(trashed: false).length.to_s : "" %> <%= cohort.uses_enrollment? ? link_to('+',(Prep::Constants::Enroll + Base64.strict_encode64({contractor: cohort.provider.long_name, cohort: cohort.name + " (" + cohort.extra_name + ")", curriculum: cohort.curriculum_choice, magic: cohort.coho_up.magic_code, contacts: (User.with_role(:site_admin, cohort.provider).pluck(:email) * ", ")}.to_json))) : "—" %></td>
+            <td><%= cohort.coho_up.entry_surveys.nil? ? "0" : cohort.coho_up.entry_surveys.length.to_s %></td>
+            <td><%= cohort.coho_up.exit_surveys.nil? ? "0" : cohort.coho_up.exit_surveys.length.to_s %></td>
+            <td><%= link_to 'Log', facilitate_path(cohort.id) %></td>
+            <td><%= link_to 'Survey', survey_path(cohort.id) %></td>
+            <td><%= cohort.uses_enrollment? ? link_to('Enroll', enroll_path(cohort.id)) : "—" %></td>
+            <td><a class="fancyLink" href="Entry Survey for <%= cohort.name %> (<%= cohort.extra_name %>) at: <%= cohort.coho_up.link_entry %>">Copy Link</a></td>
+            <td><a class="fancyLink" href="Exit Survey <%= cohort.name %> (<%= cohort.extra_name %>) at: <%= cohort.coho_up.link_exit %>">Copy Link</a></td>
+            <td>
+              <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, cohort.provider)  %>
+                <%= link_to 'Close', new_coho_down_path(:cohort_id => cohort.id) %>
+              <% end %>
+            </td>
+            <td><%= link_to 'Show', cohort %></td>
+            <td>
+                <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, cohort.provider)  %>
+                  <%= link_to 'Edit', edit_cohort_path(cohort) %>
+                <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <br>
+  <% end %>
+<% end %>
+
+<% if @active_cohorts.present? %>
+  <% if @active_cohorts.length > 0 %>
+    <h1>Active Cohorts</h1>
+    <table class="apa">
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th colspan="3">Name</th>
+          <th>Time Passed</th>
+          <th>Sessions Logged</th>
+          <th>Enrollment</th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Survey Counts</div></div>
+            <div class="row">
+              <div class="col">Entry</div>
+              <div class="col">Exit</div>
+            </div>
+          </th>
+          <th colspan="3">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Helpers</div></div>
+            <div class="row">
+              <div class="col">Log</div>
+              <div class="col">Survey</div>
+              <div class="col">Enroll</div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Survey Links</div></div>
+            <div class="row">
+              <div class="col">Entry</div>
+              <div class="col">Exit</div>
+            </div>
+          </th>
+          <th colspan="3" style="text-align: center">Tools</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @active_cohorts.each do |cohort| %>
+          <tr>
+            <td><%= cohort.provider.period %></td>
+            <td><%= cohort.provider.long_name %></td>
+            <td><%= cohort.name %></td>
+            <td><%= cohort.extra_name %></td>
+            <td>
+              <% if (cohort.intended_finish - cohort.intended_start) > 0 %>
+                <% if (((Date.parse(DateTime.now().to_s) - cohort.intended_start) / (cohort.intended_finish - cohort.intended_start)).to_f * 100).to_i > 100 %>
+                  100%
+                <% else %>
+                  <% if (((Date.parse(DateTime.now().to_s) - cohort.intended_start) / (cohort.intended_finish - cohort.intended_start)).to_f * 100).to_i < 0 %>
+                    0%
+                  <% else %>
+                    <%= (((Date.parse(DateTime.now().to_s) - cohort.intended_start) / (cohort.intended_finish - cohort.intended_start)).to_f * 100).to_i.to_s %>%
+                  <% end %>
+                <% end %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td>
+              <%= cohort.session_logs.length.to_s %>/<%= cohort.intended_session_count.to_s %> 
+              <% if current_user.has_role?(:facilitator, cohort.provider) or current_user.has_role?(:technician) %>
+                <%= link_to '+', new_session_log_url(magic_code: cohort.coho_up.magic_code) %>
+              <% end %>
+            </td>
+            <td><%= cohort.uses_enrollment? ? cohort.enrollments.where(trashed: false).length.to_s : "" %> <%= cohort.uses_enrollment? ? link_to('+',(Prep::Constants::Enroll + Base64.strict_encode64({contractor: cohort.provider.long_name, cohort: cohort.name + " (" + cohort.extra_name + ")", curriculum: cohort.curriculum_choice, magic: cohort.coho_up.magic_code, contacts: (User.with_role(:site_admin, cohort.provider).pluck(:email) * ", ")}.to_json))) : "—" %></td>
+            <td><%= cohort.coho_up.entry_surveys.nil? ? "0" : cohort.coho_up.entry_surveys.length.to_s %></td>
+            <td><%= cohort.coho_up.exit_surveys.nil? ? "0" : cohort.coho_up.exit_surveys.length.to_s %></td>
+            <td><%= link_to 'Log', facilitate_path(cohort.id) %></td>
+            <td><%= link_to 'Survey', survey_path(cohort.id) %></td>
+            <td><%= cohort.uses_enrollment? ? link_to('Enroll', enroll_path(cohort.id)) : "—" %></td>
+            <td><a class="fancyLink" href="Entry Survey for <%= cohort.name %> (<%= cohort.extra_name %>) at: <%= cohort.coho_up.link_entry %>">Copy Link</a></td>
+            <td><a class="fancyLink" href="Exit Survey <%= cohort.name %> (<%= cohort.extra_name %>) at: <%= cohort.coho_up.link_exit %>">Copy Link</a></td>
+            <td>
+              <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, cohort.provider)  %>
+                <%= link_to 'Close', new_coho_down_path(:cohort_id => cohort.id) %>
+              <% end %>
+            </td>
+            <td><%= link_to 'Show', cohort %></td>
+            <td>
+                <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, cohort.provider)  %>
+                  <%= link_to 'Edit', edit_cohort_path(cohort) %>
+                <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>
+
+<br>
+<% if current_user.has_role?(:site_admin, :any) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:technician) or current_user.has_role?(:vicar) %>
+  <% if @draft_cohorts.present? %>
+    <% if @draft_cohorts.length > 0 %>
+      <h1>Draft Cohorts</h1>
+      <table class="apa">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th colspan="3">Name</th>
+            <th>Curriculum choice</th>
+            <th>Intended participants</th>
+            <th>Intended start</th>
+            <th>Intended finish</th>
+            <th>Activate</th>
+            <th colspan="3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @draft_cohorts.each do |cohort| %>
+            <tr>
+              <td><%= cohort.provider.period %></td>
+              <td><%= cohort.provider.long_name %></td>
+              <td><%= cohort.name %></td>
+              <td><%= cohort.extra_name %></td>
+              <td><%= cohort.curriculum_choice %></td>
+              <td><%= cohort.intended_participants_ms + cohort.intended_participants_hs %></td>
+              <td><%= cohort.intended_start %></td>
+              <td><%= cohort.intended_finish %></td>
+              <td><%= link_to 'Activate', new_coho_up_path(:cohort_id => cohort.id) %></td>
+              <td><%= link_to 'Show', cohort %></td>
+              <td><%= link_to 'Edit', edit_cohort_path(cohort) %></td>
+              <td><%= link_to 'Destroy', cohort, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <br>
+        <br>
+      <h1>Finished Cohorts</h1>
+      <table class="apa">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th colspan="3">Name</th>
+            <th>Curriculum choice</th>
+            <th>Initiated</th>
+            <th>Graduated</th>
+            <th>Receipt</th>
+            <th>Sessions Logged</th>
+            <th>IRR</th>
+            <th>Drift</th>
+            <th colspan="<%= current_user.has_role?(:technician) or current_user.has_role?(:vicar) ? 4 : 2 %>"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @finished_cohorts.each do |cohort| %>
+            <tr>
+              <td><%= cohort.provider.period %></td>
+              <td><%= cohort.provider.long_name %></td>
+              <td><%= cohort.name %></td>
+              <td><%= cohort.extra_name %></td>
+              <td><%= cohort.curriculum_choice %></td>
+              <td><%= cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs %></td>
+              <td><%= cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs %></td>
+              <td>
+                <% if cohort.coho_down.receipt.attached? %>
+                  <input type="checkbox" checked="checked" id="checkboxa<% cohort.id %>" name="checkbox<% cohort.id %>" value="1" disabled="true">
+                  <% if signed_in? %>
+                    <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) %>
+                      <%= link_to '(Get)', rails_storage_proxy_path(cohort.coho_down.receipt, disposition: "attachment" ) %>
+                      <%= link_to '(Del)', delete_receipt_session_log_path(cohort.coho_down.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <input type="checkbox" id="checkboxa<% cohort.id %>" name="checkbox<% cohort.id %>" value="0" disabled="true">
+                <% end %>
+              </td>
+              <td><%= cohort.session_logs.length.to_s %></td>
+              <td><%= cohort.reliable_stat %>%</td>
+              <td><%= cohort.drift_stat %></td>
+              <% if current_user.has_role?(:technician) or current_user.has_role?(:vicar) %>
+                <td>
+                  <%= link_to 'Entry', cohort.coho_up.link_entry %>
+                </td>
+                <td>
+                  <%= link_to 'Exit', cohort.coho_up.link_exit %>
+                </td>
+              <% end %>
+              <td><%= link_to 'Edit', edit_coho_down_path(cohort.coho_down) %></td>
+              <td><%= link_to 'Show', cohort %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  <% end %>
+
+  <% if @closed_cohorts.present? %>
+    <% if @closed_cohorts.length > 0 %>
+      <h1>Closed Cohorts</h1>
+      <table class="apa">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th colspan="3">Name</th>
+            <th>Curriculum choice</th>
+            <th>Initiated</th>
+            <th>Graduated</th>
+            <th>Receipt</th>
+            <th>Sessions Logged</th>
+            <th>IRR</th>
+            <th>Drift</th>
+            <th colspan="<%= current_user.has_role?(:technician) or current_user.has_role?(:vicar) ? 4 : 2 %>"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @closed_cohorts.each do |cohort| %>
+            <tr>
+              <td><%= cohort.provider.period %></td>
+              <td><%= cohort.provider.long_name %></td>
+              <td><%= cohort.name %></td>
+              <td><%= cohort.extra_name %></td>
+              <td><%= cohort.curriculum_choice %></td>
+              <td><%= cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs %></td>
+              <td><%= cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs %></td>
+              <td>
+                <% if cohort.coho_down.receipt.attached? %>
+                  <input type="checkbox" checked="checked" id="checkboxa<% cohort.id %>" name="checkbox<% cohort.id %>" value="1" disabled="true">
+                  <% if signed_in? %>
+                    <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) %>
+                      <%= link_to '(Get)', rails_storage_proxy_path(cohort.coho_down.receipt, disposition: "attachment" ) %>
+                      <%= link_to '(Del)', delete_receipt_session_log_path(cohort.coho_down.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <input type="checkbox" id="checkboxa<% cohort.id %>" name="checkbox<% cohort.id %>" value="0" disabled="true">
+                <% end %>
+              </td>
+              <td><%= cohort.session_logs.length.to_s %></td>
+              <td><%= cohort.reliable_stat %>%</td>
+              <td><%= cohort.drift_stat %></td>
+              <% if current_user.has_role?(:technician) or current_user.has_role?(:vicar) %>
+                <td>
+                  <%= cohort.entry_surveys.length %><br />
+                  <%= link_to 'Entry', cohort.coho_up.link_entry %>
+                </td>
+                <td>
+                  <%= cohort.exit_surveys.length %><br />
+                  <%= link_to 'Exit', cohort.coho_up.link_exit %>
+                </td>
+              <% end %>
+              <td><%= link_to 'Edit', edit_coho_down_path(cohort.coho_down) %></td>
+              <td><%= link_to 'Show', cohort %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  <% end %>
+  <br>
+  <%= link_to 'New Cohort', new_cohort_path %>
+<% end %>

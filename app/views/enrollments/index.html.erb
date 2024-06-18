@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Enrollment for Active Cohorts</h1>
+<p>Enrollment is collected from registration forms after verifying necessary signatures and consent. In order to make any changes to the enrollment GaPR has, please <i>trash</i> a row that needs changing and then re-enroll the participant using the registration form. This might require a participant or parent to re-submit the form. Doing this will ensure that GaPR's records never differ from the forms sent to Site Administrators during registration. Please contact us if you have any questions or technical difficulties!</p>
+<% @providers.order(:pmms_aggregate_name).each do |provider| %>
+  <h2><%= provider.long_name %></h2>
+  <% @active_cohorts.where(provider_id: provider.id).order(:name).each do |cohort| %>
+    <table class="apa">
+      <caption><%= cohort.name %> (<%= cohort.extra_name %>)<%= link_to('(Enroll More)',(Prep::Constants::Enroll + Base64.strict_encode64({contractor: cohort.provider.long_name, cohort: cohort.name + " (" + cohort.extra_name + ")", curriculum: cohort.curriculum_choice, magic: cohort.coho_up.magic_code, contacts: (User.with_role(:site_admin, cohort.provider).pluck(:email) * ", ")}.to_json))) %></caption>
+      
+      
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age at Registration</th>
+          <th>Attendance</th>
+          <th>Teachable</th>
+          <th>Surveyable</th>
+          <th><%= current_user.has_role?(:technician) ? "Visibility" : "" %></th>
+          <th colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @enrollments.where(cohort_id: cohort.id).order(:name_last).each do |participant| %>
+        <tr>
+          <td><%= (participant.name_pref.length > 0 ? (participant.name_pref + " (" + participant.name_first + ")") : participant.name_first) + " " + participant.name_last %></td>
+          <td><%= participant.age.to_i.to_s %></td>
+          <td><%= participant.session_logs.length.to_s + '/' + cohort.session_logs.length.to_s %></td>
+          <td><%= participant.needs_perm? ? (participant.perm_prog? ? "✔" : "✘") : "✔" %></td>
+          <td><%= participant.needs_perm? ? (participant.perm_surveys? ? "✔" : "✘") : "✔" %></td>
+          <td><%= current_user.has_role?(:technician) ? (participant.trashed? ? "🔒" : "👁") : "" %></td>
+          <td><%= current_user.has_role?(:technician) ? link_to('🖉', edit_enrollment_path(participant)) : "" %></td>
+          <td><%= link_to('🗑', hide_enrollment_path(participant), method: :post, data: { confirm: 'Delete it? Are you sure?' }) %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+<% end %>

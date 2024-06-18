@@ -1,0 +1,107 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%= @staff_training_event.training_name %></h1>
+<p>
+  <%= @staff_training_event.training_trainer %><br />
+  <%= @staff_training_event.training_date.strftime("%B %-d, %Y") %><br />
+  <%= @staff_training_event.training_place %><br />
+</p>
+<% if signed_in? %>
+  <% if current_user.has_role?(:technician) %>
+    <p>
+      <strong>Period:</strong> <%= @staff_training_event.period %><br />
+      <strong>Lookup:</strong> <%= @staff_training_event.lookup %>
+    </p>
+  <% end %>
+<% end %>
+
+<p>There are <%= @staff_training_event.staff_training_surveys.length %> surveys recorded for this event.</p>
+
+<% if @staff_training_event.staff_training_surveys.length > 3 %>
+  <table class="apa">
+  <caption>Staff Training Survey Responses</caption>
+    <tr>
+      <th>Domain</th>
+      <th colspan="5">
+        <div class="row" style="border-bottom: 1px solid black; width: 100%; margin: auto"><div style="margin: auto">Totals</div></div>
+        <div class="row; width: 100%">
+          <div class="row">
+            <div class="col-sm">(Strongly)</div>
+            <div class="col-sm">Disagree</div>
+            <div class="col-sm">Neutral</div>
+            <div class="col-sm">Agree</div>
+            <div class="col-sm">(Strongly)</div>
+          </div>
+        </div>
+      </th>
+    </tr>
+    <tr>
+      <td>Interest</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_interest: 1).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_interest: 2).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_interest: 3).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_interest: 4).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_interest: 5).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+    </tr>
+    <tr>
+      <td>Relevance</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_relevance: 1).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_relevance: 2).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_relevance: 3).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_relevance: 4).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_relevance: 5).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+    </tr>
+    <tr>
+      <td>Usability</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_use: 1).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_use: 2).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_use: 3).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_use: 4).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_use: 5).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+    </tr>
+    <tr>
+      <td>Sharable</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_share: 1).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_share: 2).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_share: 3).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_share: 4).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_share: 5).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+    </tr>
+    <tr>
+      <td>Will Recommend</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_recommend: 1).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_recommend: 2).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_recommend: 3).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_recommend: 4).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+      <td><%= ((@staff_training_event.staff_training_surveys.where(quality_will_recommend: 5).length * 100.to_f) / @staff_training_event.staff_training_surveys.length).to_i %>%</td>
+    </tr>
+  </table>
+  
+  <h2>What was good about the training?</h2>
+  <% if @staff_training_event.staff_training_surveys.where("details_good <> ''").length > 0 %>
+    <ul>
+      <% @staff_training_event.staff_training_surveys.where("details_good <> ''").pluck(:details_good).map{|i| i.downcase}.uniq.each do |i| %>
+        <li><%= i %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>(No responses)</p>
+  <% end %>
+  
+  <h2>What could be better about the training?</h2>
+  <% if @staff_training_event.staff_training_surveys.where("details_improvement <> ''").length > 0 %>
+    <ul>
+      <% @staff_training_event.staff_training_surveys.where("details_improvement <> ''").pluck(:details_improvement).map{|i| i.downcase}.uniq.each do |i| %>
+        <li><%= i %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>(No responses)</p>
+  <% end %>
+  
+<% else %>
+  <p>There are not enough responses for reporting further information.</p>
+<% end %>
+
+<%= link_to 'Edit', edit_staff_training_event_path(@staff_training_event) %> |
+<%= link_to 'Back', staff_training_events_path %>

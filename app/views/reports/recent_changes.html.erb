@@ -1,0 +1,171 @@
+<h1>Recent Changes</h1>
+In the past week, users made the following changes:
+<h2>Cohort Activations</h2>
+<% if @recent_cohort_activations.empty? %>
+  (None)
+<% else %>
+<table class="apa">
+  <thead>
+    <tr>
+      <th>When</th>
+      <th>Who</th>
+      <th>How</th>
+      <th>See</th>
+      <th>What</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @recent_cohort_activations.each do |change| %>
+      <tr>
+        <td><%= change.created_at.strftime("%F") %></td>
+        <td><%= change.email %></td>
+        <td><%= change.event %></td>
+        <% if !@recent_activation_cohorts.find_by_id(change.item_id).nil? %>
+          <td>
+            <%= link_to "?", cohort_path(@recent_activation_cohorts.find_by_id(change.item_id).cohort.id) %>
+          </td>
+          <td>
+            <%= @recent_activation_cohorts.find_by_id(change.item_id).cohort.name %>
+            <% if ! @recent_activation_cohorts.find_by_id(change.item_id).cohort.extra_name.empty? %> 
+              (<%= @recent_activation_cohorts.find_by_id(change.item_id).cohort.extra_name %>)
+            <% end %>
+          </td>
+        <% else %>
+          <td></td>
+          <td>(Destroyed)</td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<h2>Cohort Declarations</h2>
+<% if @recent_cohort_changes.empty? %>
+  (None)
+<% else %>
+<table class="apa">
+  <thead>
+    <tr>
+      <th>When</th>
+      <th>Who</th>
+      <th>How</th>
+      <th>See</th>
+      <th>What</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @recent_cohort_changes.each do |change| %>
+      <tr>
+        <td><%= change.created_at.strftime("%F") %></td>
+        <td><%= change.email %></td>
+        <td><%= change.event %></td>
+        <% if !@recent_cohorts.find_by_id(change.item_id).nil? %>
+          <td>
+            <%= link_to "?", cohort_path(change.item_id) %>
+          </td>
+          <td>
+            <%= @recent_cohorts.find_by_id(change.item_id).name %>
+            <% if ! @recent_cohorts.find_by_id(change.item_id).extra_name.empty? %> 
+              (<%= @recent_cohorts.find_by_id(change.item_id).extra_name %>)
+            <% end %>
+          </td>
+        <% else %>
+          <td></td>
+          <td>(Destroyed)</td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<h2>Cohort Closures</h2>
+<% if @recent_closure_cohorts.empty? %>
+  (None)
+<% else %>
+  <table class="apa">
+    <thead>
+      <tr>
+        <th>When</th>
+        <th>Who</th>
+        <th>How</th>
+        <th>See</th>
+        <th>What</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @recent_cohort_closures.each do |change| %>
+        <tr>
+          <td><%= change.created_at.strftime("%F") %></td>
+          <td><%= change.email %></td>
+          <td><%= change.event %></td>
+          <% if !@recent_closure_cohorts.find_by_id(change.item_id).nil? %>
+            <td>
+              <%= link_to "?", cohort_path(@recent_closure_cohorts.find_by_id(change.item_id).cohort.id) %>
+            </td>
+            <td>
+              <%= @recent_closure_cohorts.find_by_id(change.item_id).cohort.name %>
+              <% if ! @recent_closure_cohorts.find_by_id(change.item_id).cohort.extra_name.empty? %> 
+                (<%= @recent_closure_cohorts.find_by_id(change.item_id).cohort.extra_name %>)
+              <% end %>
+            </td>
+          <% else %>
+            <td></td>
+            <td>(Destroyed)</td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<h2>Session Logs</h2>
+<% if @recent_session_logs.empty? %>
+  (None)
+<% else %>
+  <table class="apa">
+    <thead>
+      <tr>
+        <th>When</th>
+        <th>Who</th>
+        <th>How</th>
+        <th>See</th>
+        <th>What</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @recent_session_logs.each do |change| %>
+        <tr>
+          <td><%= change.created_at.strftime("%F") %></td>
+          <td>
+            <% if change.email.empty? %>
+              (Guest)
+            <% else %>
+              <%= change.email %>
+            <% end %>
+          </td>
+          <td><%= change.event %></td>
+          <% if !@recent_session_log_cohorts.find_by_id(change.item_id).nil? %>
+            <td>
+              <%= link_to "?", session_log_path(change.item_id) %>
+            </td>
+            <td>
+              <%= @recent_session_log_cohorts.find_by_id(change.item_id).cohort.name %>
+              <% if ! @recent_session_log_cohorts.find_by_id(change.item_id).cohort.extra_name.empty? %> 
+                (<%= @recent_session_log_cohorts.find_by_id(change.item_id).cohort.extra_name %>)
+              <% end %>
+            </td>
+          <% else %>
+            <td></td>
+            <td>(Destroyed)</td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

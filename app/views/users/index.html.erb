@@ -1,0 +1,122 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Users</h1>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Technician</th>
+      <th>Vicar</th>
+      <th>Test</th>
+      <th>Active</th>
+      <th>State Coordinator</th>
+      <th>Site Admin</th>
+      <th>Facilitator</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.email %></td>
+        <td>
+          <% if user.has_role?(:technician) %>
+            <% if user.id == current_user.id %>
+              👑
+            <% else %>
+              👑<%= link_to '-', detechnician_user_path(user), method: :post %>
+            <% end %>
+          <% else %>
+            <input type="checkbox" id="checkboxt<% user.id %>" name="checkboxb<% user.id %>" value="0" disabled="true"> <%= link_to '+👑', technician_user_path(user), method: :post %>
+          <% end %>
+        </td>
+        <td>
+          <% if user.has_role?(:vicar) %>
+            <input type="checkbox" checked="checked" id="checkboxvb<% user.id %>" name="checkboxvb<% user.id %>" value="1" disabled="true"> <%= link_to '-', devicar_user_path(user), method: :post %>
+          <% else %>
+            <input type="checkbox" id="checkboxvb<% user.id %>" name="checkboxvb<% user.id %>" value="0" disabled="true"> <%= link_to '+', vicar_user_path(user), method: :post %>
+          <% end %>
+        </td>
+        <td>
+          <% if user.has_role?(:test) %>
+            <% if user.id == current_user.id %>
+              (You)
+            <% else %>
+              ⚗<%= link_to '-', detestify_user_path(user), method: :post %>
+            <% end %>
+          <% else %>
+            <input type="checkbox" id="checkboxt<% user.id %>" name="checkboxt<% user.id %>" value="0" disabled="true"> <%= link_to '+⚗', testify_user_path(user), method: :post %>
+          <% end %>
+        </td>
+        <td>
+          <% if user.active %>
+            <% if user.id == current_user.id %>
+              (You)
+            <% else %>
+              ⏻<%= link_to '-', deactivate_user_path(user), method: :post %>
+            <% end %>
+          <% else %>
+             ⭘<%= link_to '+', activate_user_path(user), method: :post %>
+          <% end %>
+        </td>
+        <td>
+          <% if user.has_role?(:state_coordinator) %>
+            <input type="checkbox" checked="checked" id="checkboxb<% user.id %>" name="checkboxb<% user.id %>" value="1" disabled="true"> <%= link_to '-', decoordinate_user_path(user), method: :post %>
+          <% else %>
+            <input type="checkbox" id="checkboxb<% user.id %>" name="checkboxb<% user.id %>" value="0" disabled="true"> <%= link_to '+', coordinate_user_path(user), method: :post %>
+          <% end %>
+        </td>
+        <td>
+        <% if user.has_role? :site_admin, :any %>
+          <% Provider.with_role(:site_admin, user).order(:period).each do |provider| %>
+            <div><%= provider.period.to_s + ": " + provider.long_name %> <%= link_to 'X', del_site_admin_for_user_path(id: user.id, pid: provider.id), method: :post %></div>
+          <% end %>
+        <% else %>
+          <div>(None)</div>
+        <% end %>
+        </td>
+        <td>
+        <% if user.has_role? :facilitator, :any %>
+          <% Provider.with_role(:facilitator, user).order(:period).each do |provider| %>
+            <div><%= provider.period.to_s + ": " + provider.long_name %> <%= link_to 'X', del_facilitator_for_user_path(id: user.id, pid: provider.id), method: :post %></div>
+          <% end %>
+        <% else %>
+          <div>(None)</div>
+        <% end %>
+        </td>
+
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<br />
+<h2>Add Site Admin Rights</h2>
+<%= form_with url: add_site_admin_for_user_path do |form| %>
+  <div class="field">
+    <label>Active User</label>
+    <%= form.select(:id, User.all.where(active: true).order(:email).collect { |v| [ v.email, v.id ] }, {}, { "data-placeholder": "Select User" }) %>
+  </div>
+  <div class="field">
+    <%= form.label :provider_id %>
+    <%= form.select(:pid, Provider.all.order(:period, :long_name).collect { |v| [ (v.period.to_s + ": " + v.long_name), v.id ] }, {}, { "data-placeholder": "Select Provider" }) %>
+  </div>
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<h2>Add Facilitator Rights</h2>
+<%= form_with url: add_facilitator_for_user_path do |form| %>
+  <div class="field">
+    <label>Active User</label>
+    <%= form.select(:id, User.all.where(active: true).order(:email).collect { |v| [ v.email, v.id ] }, {}, { "data-placeholder": "Select User" }) %>
+  </div>
+  <div class="field">
+    <%= form.label :provider_id %>
+    <%= form.select(:pid, Provider.all.order(:period, :long_name).collect { |v| [ (v.period.to_s + ": " + v.long_name), v.id ] }, {}, { "data-placeholder": "Select Provider" }) %>
+  </div>
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

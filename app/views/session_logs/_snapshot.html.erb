@@ -1,0 +1,146 @@
+<%= form_with(model: session_log, local: true) do |form| %>
+  <div class="field">
+    <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year, hidden: true, disabled: true %>
+  </div>
+  
+    <h2>Were surveys taken?</h2>
+  <div class="field">
+    <%= form.check_box :did_entry_survey, disabled: true %>
+    <%= form.label :did_entry_survey %>
+  </div>
+  
+  <div class="field">
+    <%= form.check_box :did_exit_survey, disabled: true %>
+    <%= form.label :did_exit_survey %>
+  </div>
+  
+  <h2>What was taught?</h2>
+  <div class="field">
+    <%= form.collection_check_boxes :module_lookup_ids, @modules, :id, :fancy_name do |b| %>
+      <%= b.check_box disabled: true %>
+      <%= b.label %>
+      <br />
+    <% end %>
+  </div>
+
+  <h2>When and How Long?</h2>
+
+  <div class="field">
+    <%= form.text_field :magic_code, readonly: true, hidden: true, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= form.text_field :cohort_id, readonly: true, hidden: true, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :happened_on, 'Session Date (YYYY-MM-DD):' %>
+    <%= form.text_field :happened_on, required: true, class: "datepicker", disabled: true %>
+  </div>
+  
+  <div class="field">
+    <%= form.label :minutes_taught %>
+    <%= form.number_field :minutes_taught, required: true, min: 0, disabled: true %>
+  </div>
+
+  <h2>How many?</h2>
+  
+  <table>
+    <tr>
+      <th>Age Group</th>
+      <th>How many total?</th>
+      <th>Of these, how many were new?</th>
+    </tr>
+    <tr>
+      <td>
+        Middle-School (&lt;18)
+      </td>
+      <td>
+        <div class="field">
+          <%= form.number_field :middleschool_headcount, required: true, min: 0, disabled: true %>
+        </div>
+      </td>
+      <td>
+        <div class="field">
+          <%= form.number_field :newface_ms_headcount, required: true, min: 0, disabled: true %>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        High-School (&GreaterEqual;18)
+      </td>
+      <td>
+        <div class="field">
+          <%= form.number_field :highschool_headcount, required: true, min: 0, disabled: true %>
+        </div>
+      </td>
+      <td>
+        <div class="field">
+          <%= form.number_field :newface_hs_headcount, required: true, min: 0, disabled: true %>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <% if @cohort.uses_enrollment %>
+    <h2>Who was there?</h2>
+    <div class="field">
+      <%= form.collection_check_boxes :enrollment_ids, @enrollments, :id, :quick_name do |c| %>
+        <%= c.check_box disabled: true %>
+        <%= c.label %>
+        <br />
+      <% end %>
+    </div>
+  <% end %>
+
+  <h2>How did it go?</h2>
+
+  <div class="field">
+    <%= form.label :participantion_proportion %>
+    <%= form.select(:participantion_proportion, ['Most participated', 'Some participated', 'Few participated'], {}, {prompt: 'Select one', disabled: true}) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :interest_proportion %>
+    <%= form.select(:interest_proportion, ['Most were interested', 'Some were interested', 'Few were interested'], {}, {prompt: 'Select one', disabled: true}) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :enough_time %>
+    <%= form.select(:enough_time, ['There was enough time', 'There was almost enough time', 'There was not enough time'], {}, {prompt: 'Select one', disabled: true}) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :taught_everything %>
+    <%= form.check_box :taught_everything, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :adapted_anything %>
+    <%= form.check_box :adapted_anything, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :participant_referal %>
+    <%= form.check_box :participant_referal, disabled: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impl_setting %>
+    <%= form.select(:impl_setting, ['In School, during school', 'In School, after school', 'Community-Based Organization', 'Clinic', 'Foster Care Setting', 'Juvenile Detention Setting', 'Residential Mental Health Treatment Facility', 'Virtual', 'Other'], {}, {prompt: 'Select one', disabled: true}) %>
+  </div>
+  <h2>Receipts</h2>
+  <% if session_log.receipt.attached? %>
+    <p>A receipt is attached. <%= link_to 'Delete Receipt', delete_receipt_session_log_path(session_log.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %></p>
+  <% else %>
+    <p>No receipt was attached.</p>
+  <% end %>
+
+  <h2>Sign-Off and Submit</h2>
+  <div class="field">
+    <%= form.label :facilitator_initial %>
+    <%= form.text_field :facilitator_initial, required: true, disabled: true %>
+  </div>
+
+<% end %>

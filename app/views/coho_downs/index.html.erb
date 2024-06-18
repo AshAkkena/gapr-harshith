@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Coho Downs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Period</th>
+      <th>Provider</th>
+      <th colspan="2">Cohort</th>
+      <th>Total graduated ms</th>
+      <th>Total graduated hs</th>
+      <th>Total initiated ms</th>
+      <th>Total initiated hs</th>
+      <th>Total hours delivered</th>
+      <th>Program complete</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @coho_downs.each do |coho_down| %>
+      <tr>
+        <td><%= coho_down.cohort.period %></td>
+        <td><%= coho_down.cohort.provider.long_name %></td>
+        <td><%= coho_down.cohort.name %></td>
+        <td><%= coho_down.cohort.extra_name %></td>
+        <td><%= coho_down.total_hours_delivered %></td>
+        <td><%= coho_down.program_complete %></td>
+        <td><%= coho_down.census_foster %></td>
+        <td><%= coho_down.census_homeless %></td>
+        <td><%= coho_down.census_pregnant_parenting %></td>
+        <td><%= coho_down.census_adjudication %></td>
+        <td><%= link_to 'Show', coho_down %></td>
+        <td><%= link_to 'Edit', edit_coho_down_path(coho_down) %></td>
+        <td><%= link_to 'Destroy', coho_down, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Coho Down', new_coho_down_path %>

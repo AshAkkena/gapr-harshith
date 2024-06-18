@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Entry Surveys</h1>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Magic</th>
+      <th>Contractor</th>
+      <th>Cohort</th>
+      <th>Curriculum</th>
+      <th>Created</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @entry_surveys.each do |entry_survey| %>
+      <tr>
+        <td><%= entry_survey.magic %><%= entry_survey.coho_up.nil? ? "✗" : "✔" %></td>
+        <td><%= entry_survey.contractor %></td>
+        <td><%= entry_survey.cohort %></td>
+        <td><%= entry_survey.curriculum %></td>
+        <td><%= entry_survey.created_at.localtime.to_s %></td>
+        <td><%= link_to 'Show', entry_survey %></td>
+        <td><%= link_to 'Edit', edit_entry_survey_path(entry_survey) %></td>
+        <td><%= link_to 'Destroy', entry_survey, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>

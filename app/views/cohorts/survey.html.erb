@@ -1,0 +1,61 @@
+<% content_for :header do %>
+  <script>
+    function doCopyTextEntry() {
+      /* Get the text field */
+      var copyText = document.getElementById("copyThisEntry");
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+       /* Copy the text inside the text field */
+      navigator.clipboard.writeText(copyText.value);
+
+      $('#copyTooltipEntry').fadeIn("fast");
+      $('#copyTooltipEntry').fadeOut(3000)
+    } 
+    function doCopyTextExit() {
+      /* Get the text field */
+      var copyText = document.getElementById("copyThisExit");
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+       /* Copy the text inside the text field */
+      navigator.clipboard.writeText(copyText.value);
+
+      $('#copyTooltipExit').fadeIn("fast");
+      $('#copyTooltipExit').fadeOut(3000)
+    } 
+
+  </script>
+<% end %>
+<p id="notice"><%= notice %></p>
+
+<div class="d-print-none">
+  <h1>Participant Surveys</h1>
+  <input type="text" readonly="true" value="<%= @cohort.coho_up.link_entry %>" id="copyThisEntry" hidden="hidden" />
+  <input type="text" readonly="true" value="<%= @cohort.coho_up.link_exit %>" id="copyThisExit" hidden="hidden" />
+</div>
+<div class="d-none d-print-block">
+  <h1 style="text-align: center">Georgia PREP</h1>
+</div>
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+  <div><h2 style="text-align: center">Entry Survey<br /><%= @cohort.name %> (<%= @cohort.extra_name %>)</h2></div>
+  <div style="padding-top: 10px; padding-bottom: 10px"><%= RQRCode::QRCode.new( @cohort.coho_up.link_entry ).as_svg(offet: 0, color: '000', shape_rendering: 'crisp_edges', module_size: 6).html_safe %></div>
+  <div class="d-print-none"><button onclick="doCopyTextEntry()" id="copyLinkButtonEntry">Copy Link</button></div>
+  <div class="d-print-none"><p>&nbsp;<span style="color: green; display: none" id="copyTooltipEntry" role="tooltip">Link copied!</span>&nbsp;</p></div>
+</div>
+
+<div class="d-none d-print-block" style="page-break-before: always">
+  <h1 style="text-align: center">Georgia PREP</h1>
+</div>
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+  <div><h2 style="text-align: center">Exit Survey<br /><%= @cohort.name %> (<%= @cohort.extra_name %>)</h2></div>
+  <div style="padding-top: 10px; padding-bottom: 10px"><%= RQRCode::QRCode.new( @cohort.coho_up.link_exit ).as_svg(offet: 0, color: '000', shape_rendering: 'crisp_edges', module_size: 6).html_safe %></div>
+  <div class="d-print-none"><button onclick="doCopyTextExit()" id="copyLinkButtonExit">Copy Link</button></div>
+  <div class="d-print-none"><p>&nbsp;<span style="color: green; display: none" id="copyTooltipExit" role="tooltip">Link copied!</span>&nbsp;</p></div>
+</div>

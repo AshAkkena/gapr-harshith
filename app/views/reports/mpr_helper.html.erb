@@ -1,0 +1,79 @@
+<h1>Cohort Implementation Reports<h1>
+<p>This page is intended to help summarize data to make it easier to fill out relevant GaPR portions of the Monthly Programmatic Report.<br />If your program data are not entered correctly, these numbers definitely won't look right.<br />This tool is under construction. Let us know if anything looks incorrect!</p>
+<% @results.each do |i| %>
+  <h2><%= i[:provider][:long_name] %></h2>
+  <table class="apa">
+    <caption>Currently active cohorts (<%= i[:provider][:period].to_s %>)</caption>
+    <tr>
+      <th>Name</th>
+      <th>Start</th>
+      <th>Finish</th>
+      <th>Initiates</th>
+      <th colspan="3">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Sessions</div></div>
+          <div class="row">
+            <div class="col">Intended</div>
+            <div class="col">Expected</div>
+            <div class="col">Observed</div>
+        </div>
+      </th>
+    </tr>
+    <% if i[:cohorts].length == 0 %>
+    <tr><td colspan="6" style="text-align: center">(No Active Cohorts)</td></tr>
+    <% else %>
+    <% i[:cohorts].each do |c| %>
+      <tr>
+        <td><%= c[:cohort].name + ' (' + c[:cohort].extra_name + ')' %></td>
+        <td><%= c[:cohort].intended_start %></td>
+        <td><%= c[:cohort].intended_finish %></td>
+        <td><%= c[:initiates] %></td>
+        <td><%= c[:cohort].intended_session_count %></td>
+        <td><%= c[:expected_sessions] %></td>
+        <td><%= c[:observed_sessions] %></td>
+      </tr>
+    <% end %>
+    <% end %>
+  </table>
+  <h3>MPR Guidance</h3>
+  <p>Has all required data and sessions logged been entered into the GaPR System?<br />
+  Based on the available data, it appears that the answer might be 
+  <% if i[:cohorts].length == 0 %>
+    <b>&quot;Yes - Completed&quot;</b> because there are no active cohorts.
+  <% else %> 
+    <% if i[:cohorts].pluck(:passes_muster).all? %>
+      <b>&quot;Yes - In Process&quot;</b> because all active cohorts have sufficient session logs.
+    <% else %>
+      <b>&quot;No&quot;</b> because GaPR is expecting more session logs than it finds.<br />Explain why on the form, and remember: GaPR could be mistaken!
+    <% end %>
+  <% end %>
+  </p>
+  
+  <p>Approximately how many youth are enrolled at all your implementing sites?<br />
+  When GaPR looks at the session logs for your active cohorts, it counts a total of <b><%= i[:cohorts].pluck(:initiates).sum %></b> &quot;new&quot; participants across all sessions, which should match the enrollment count you have on file.
+  </p>
+  
+  <p>Approximately how many youth are on track to successfully complete/graduate from the PREP program?<br />
+  <% if (i[:cohorts].pluck(:initiates).sum * i[:cohorts].pluck(:observed_sessions).sum ) == 0 %>
+    GaPR isn't able to answer this question for you based on the available data.
+  <% else %>
+    When GaPR looks at the session logs for your active cohorts, it counts a total of <%= i[:cohorts].pluck(:attendances).sum %> participation events across all sessions, which is <%= ((i[:cohorts].pluck(:attendances).sum.to_f * 100) / (i[:cohorts].pluck(:initiates).sum * i[:cohorts].pluck(:observed_sessions).sum )).to_i %>% of what it thinks is the best-case scenario.<br />That could represent <b>about <%= ((i[:cohorts].pluck(:initiates).sum) * (((i[:cohorts].pluck(:attendances).sum.to_f) / (i[:cohorts].pluck(:initiates).sum * i[:cohorts].pluck(:observed_sessions).sum )))).to_i %></b> participants on-track to graduate, on average, but the actual number could vary for multiple reasons.
+  <% end %>
+  </p>
+  
+  <p>Is your program meeting or maintaining an 60% rate of entry survey submissions?<br />
+  <% if (i[:all_initiates]) == 0 %>
+    GaPR isn't able to answer this question for you based on the available data.
+  <% else %>
+    When GaPR looks at the session logs for all your cohorts, it counts a total of <%= i[:all_initiates] %> initiates. We have surveys for <b><%= ((i[:all_entry].to_f * 100) / i[:all_initiates]).to_i %>%</b> of them.<br />
+  <% end %>
+  </p>
+  
+  <p>Is your program meeting or maintaining an 60% rate of exit survey submissions?<br />
+  <% if (i[:all_graduates]) == 0 %>
+    GaPR isn't able to answer this question for you based on the available data; this is most likely due to an absence of closed cohorts to analyze.
+  <% else %>
+    When GaPR looks at the closure for all your cohorts, it counts a total of <%= i[:all_graduates] %> graduates. We have surveys for <b><%= ((i[:all_exit].to_f * 100) / i[:all_graduates]).to_i %>%</b> of them.<br />
+  <% end %>
+  </p>
+<% end %>
+

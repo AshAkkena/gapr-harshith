@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  session_log: one
+  module_lookup: one
+
+two:
+  session_log: two
+  module_lookup: two

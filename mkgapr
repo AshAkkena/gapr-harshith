@@ -1,0 +1,6 @@
+#!/bin/bash
+RAILS_ENV=production
+rake db:migrate
+rake assets:clobber
+rake assets:precompile
+RAILS_SERVE_STATIC_FILES=1 rails server -e production -p 5050 -b 'ssl://0.0.0.0:2021?key=gapr-ddns.key&cert=gapr-ddns.crt'

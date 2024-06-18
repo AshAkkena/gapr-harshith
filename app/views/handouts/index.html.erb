@@ -1,0 +1,52 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Resources</h1>
+<hr />
+<p>These handouts, memos, and other documents may assist in the implementation of PREP. If you have any questions about these, please don't hesitate to contact your State Coordinator or the Evaluation Team.</p>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <% if current_user.has_role?(:technician) %>
+        <th>Active?</th>
+      <% end %>
+      <th>Tools</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @handouts.each do |handout| %>
+      <tr>
+        <td><%= handout.title %></td>
+        <% if current_user.has_role?(:technician) %>
+          <td>
+            <% if handout.active? %>
+              <input type="checkbox" checked="checked" id="checkboxr<% handout.id %>" name="checkboxr<% handout.id %>" value="1" disabled="true"><%= link_to '-', deactivate_handout_path(handout), method: :post %>
+            <% else %>
+              <input type="checkbox" id="checkboxr<% handout.id %>" name="checkboxr<% handout.id %>" value="0" disabled="true"><%= link_to '+', activate_handout_path(handout), method: :post %>
+            <% end %>
+          </td>
+        <% end %>
+        <td>
+          <% if handout.document.attached? %>
+            <%= link_to '(Get)', rails_storage_proxy_path(handout.document, disposition: "attachment" ) %>
+          <% end %>
+          <% if current_user.has_role?(:technician) %>
+            <%= link_to 'Show', handout %>
+            <%= link_to 'Edit', edit_handout_path(handout) %>
+            <%= link_to 'Destroy', handout, method: :delete, data: { confirm: 'Are you sure?' } %>
+          <% end %>
+        </td>
+        <td><%= handout.description %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+<% if current_user.has_role?(:technician) %>
+  <%= link_to 'New Handout', new_handout_path %>
+<% end %>

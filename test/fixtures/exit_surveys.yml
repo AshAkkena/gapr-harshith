@@ -1,0 +1,101 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  magic: MyString
+  contractor: MyString
+  cohort: MyString
+  curriculum: MyString
+  h_age: 
+  h_grade: 
+  m_age: 
+  m_grade: 
+  lang: 
+  lang_other_txt: MyString
+  is_hispanic: 
+  race: 
+  race_other_txt: MyString
+  is_male: 
+  domestic: 
+  impact_behavior_peer: 
+  impact_behavior_emotion: 
+  impact_behavior_alcohol: 
+  impact_behavior_think: 
+  impact_intent_plans: 
+  impact_intent_study: 
+  impact_intent_graduate: 
+  impact_intent_more_study: 
+  impact_intent_work: 
+  impact_finance_save: 
+  impact_finance_bank: 
+  impact_finance_budget: 
+  impact_finance_track: 
+  impact_finance_cost: 
+  impact_talk_parent: 
+  impact_talk_other: 
+  impact_relate_healthy: 
+  impact_relate_resist: 
+  impact_relate_talk: 
+  plan_abstainsex: 
+  abstain_yes_plans: 
+  abstain_yes_consequences: 
+  abstain_yes_sti: 
+  abstain_yes_preg: 
+  abstain_notyes_havesex: 
+  abstain_notyes_condom: 
+  abstain_notyes_contra: 
+  percep_clear: 
+  percep_learn: 
+  percep_ask: 
+  percep_respect: 
+  satisfaction_abstain: 
+  satisfaction_contra: 
+
+two:
+  magic: MyString
+  contractor: MyString
+  cohort: MyString
+  curriculum: MyString
+  h_age: 
+  h_grade: 
+  m_age: 
+  m_grade: 
+  lang: 
+  lang_other_txt: MyString
+  is_hispanic: 
+  race: 
+  race_other_txt: MyString
+  is_male: 
+  domestic: 
+  impact_behavior_peer: 
+  impact_behavior_emotion: 
+  impact_behavior_alcohol: 
+  impact_behavior_think: 
+  impact_intent_plans: 
+  impact_intent_study: 
+  impact_intent_graduate: 
+  impact_intent_more_study: 
+  impact_intent_work: 
+  impact_finance_save: 
+  impact_finance_bank: 
+  impact_finance_budget: 
+  impact_finance_track: 
+  impact_finance_cost: 
+  impact_talk_parent: 
+  impact_talk_other: 
+  impact_relate_healthy: 
+  impact_relate_resist: 
+  impact_relate_talk: 
+  plan_abstainsex: 
+  abstain_yes_plans: 
+  abstain_yes_consequences: 
+  abstain_yes_sti: 
+  abstain_yes_preg: 
+  abstain_notyes_havesex: 
+  abstain_notyes_condom: 
+  abstain_notyes_contra: 
+  percep_clear: 
+  percep_learn: 
+  percep_ask: 
+  percep_respect: 
+  satisfaction_abstain: 
+  satisfaction_contra: 

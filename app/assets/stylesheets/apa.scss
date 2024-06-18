@@ -1,0 +1,36 @@
+body {
+  counter-reset: apaTable;
+}
+table.apa {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  width: auto;
+  counter-increment: apaTable;
+}
+table.apa caption {
+  white-space: nowrap;
+  caption-side: top;
+  color: black;
+}
+table.apa caption::before {
+  content: "Table " counter(apaTable) ": ";
+}
+table.apa tr.apa-header {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+table.apa td, table.apa th {
+  text-align: center;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+table.apa th:first-child, table.apa td:first-child {
+  text-align: left;
+  padding-left: 0em;
+}
+table.apa th {
+  border-bottom: 1px solid black;
+}
+table.apa tr:nth-child(even) {
+  background: #dae5f4;
+}

@@ -1,0 +1,337 @@
+<%= form_with(model: entry_survey) do |form| %>
+  <% if entry_survey.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(entry_survey.errors.count, "error") %> prohibited this entry_survey from being saved:</h2>
+
+      <ul>
+        <% entry_survey.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :magic %>
+    <%= form.text_field :magic %>
+  </div>
+
+  <div class="field">
+    <%= form.label :contractor %>
+    <%= form.text_field :contractor %>
+  </div>
+
+  <div class="field">
+    <%= form.label :cohort %>
+    <%= form.text_field :cohort %>
+  </div>
+
+  <div class="field">
+    <%= form.label :curriculum %>
+    <%= form.text_field :curriculum %>
+  </div>
+
+  <div class="field">
+    <%= form.label :h_age %>
+    <%= form.text_field :h_age %>
+  </div>
+
+  <div class="field">
+    <%= form.label :h_grade %>
+    <%= form.text_field :h_grade %>
+  </div>
+
+  <div class="field">
+    <%= form.label :m_age %>
+    <%= form.text_field :m_age %>
+  </div>
+
+  <div class="field">
+    <%= form.label :m_grade %>
+    <%= form.text_field :m_grade %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_sp %>
+    <%= form.check_box :lang_sp %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_en %>
+    <%= form.check_box :lang_en %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_other %>
+    <%= form.check_box :lang_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_other_txt %>
+    <%= form.text_field :lang_other_txt %>
+  </div>
+
+  <div class="field">
+    <%= form.label :is_hispanic %>
+    <%= form.check_box :is_hispanic %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_indian %>
+    <%= form.check_box :race_indian %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_asian %>
+    <%= form.check_box :race_asian %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_black %>
+    <%= form.check_box :race_black %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_pacific %>
+    <%= form.check_box :race_pacific %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_white %>
+    <%= form.check_box :race_white %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_other %>
+    <%= form.check_box :race_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_other_txt %>
+    <%= form.text_field :race_other_txt %>
+  </div>
+
+  <div class="field">
+    <%= form.label :is_male %>
+    <%= form.check_box :is_male %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_family %>
+    <%= form.check_box :lives_family %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_foster_family %>
+    <%= form.check_box :lives_foster_family %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_foster_group %>
+    <%= form.check_box :lives_foster_group %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_couch %>
+    <%= form.check_box :lives_couch %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_outside %>
+    <%= form.check_box :lives_outside %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_shelter %>
+    <%= form.check_box :lives_shelter %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_hotel %>
+    <%= form.check_box :lives_hotel %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_jail %>
+    <%= form.check_box :lives_jail %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lives_none %>
+    <%= form.check_box :lives_none %>
+  </div>
+
+  <div class="field">
+    <%= form.label :behavior_peer %>
+    <%= form.text_field :behavior_peer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :behavior_emotion %>
+    <%= form.text_field :behavior_emotion %>
+  </div>
+
+  <div class="field">
+    <%= form.label :behavior_alcohol %>
+    <%= form.text_field :behavior_alcohol %>
+  </div>
+
+  <div class="field">
+    <%= form.label :behavior_think %>
+    <%= form.text_field :behavior_think %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_plans %>
+    <%= form.text_field :intent_plans %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_study %>
+    <%= form.text_field :intent_study %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_graduate %>
+    <%= form.text_field :intent_graduate %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_more_study %>
+    <%= form.text_field :intent_more_study %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_work %>
+    <%= form.text_field :intent_work %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_speakup_self %>
+    <%= form.text_field :intent_speakup_self %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intent_speakup_others %>
+    <%= form.text_field :intent_speakup_others %>
+  </div>
+
+  <div class="field">
+    <%= form.label :finance_save %>
+    <%= form.text_field :finance_save %>
+  </div>
+
+  <div class="field">
+    <%= form.label :finance_bank %>
+    <%= form.text_field :finance_bank %>
+  </div>
+
+  <div class="field">
+    <%= form.label :finance_budget %>
+    <%= form.text_field :finance_budget %>
+  </div>
+
+  <div class="field">
+    <%= form.label :finance_track %>
+    <%= form.text_field :finance_track %>
+  </div>
+
+  <div class="field">
+    <%= form.label :finance_cost %>
+    <%= form.text_field :finance_cost %>
+  </div>
+
+  <div class="field">
+    <%= form.label :talk_parent %>
+    <%= form.text_field :talk_parent %>
+  </div>
+
+  <div class="field">
+    <%= form.label :talk_other %>
+    <%= form.text_field :talk_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :relate_healthy %>
+    <%= form.text_field :relate_healthy %>
+  </div>
+
+  <div class="field">
+    <%= form.label :relate_info %>
+    <%= form.text_field :relate_info %>
+  </div>
+
+  <div class="field">
+    <%= form.label :relate_resist %>
+    <%= form.text_field :relate_resist %>
+  </div>
+
+  <div class="field">
+    <%= form.label :relate_talk %>
+    <%= form.text_field :relate_talk %>
+  </div>
+
+  <div class="field">
+    <%= form.label :hadsex %>
+    <%= form.check_box :hadsex %>
+  </div>
+
+  <div class="field">
+    <%= form.label :num_partners %>
+    <%= form.text_field :num_partners %>
+  </div>
+
+  <div class="field">
+    <%= form.label :condom %>
+    <%= form.text_field :condom %>
+  </div>
+
+  <div class="field">
+    <%= form.label :contraceptive %>
+    <%= form.text_field :contraceptive %>
+  </div>
+
+  <div class="field">
+    <%= form.label :preg %>
+    <%= form.text_field :preg %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sti %>
+    <%= form.text_field :sti %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaysex_hs %>
+    <%= form.text_field :sexintent_delaysex_hs %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaysex_college %>
+    <%= form.text_field :sexintent_delaysex_college %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaysex_marry %>
+    <%= form.text_field :sexintent_delaysex_marry %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaykid_marry %>
+    <%= form.text_field :sexintent_delaykid_marry %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaymarry_work %>
+    <%= form.text_field :sexintent_delaymarry_work %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sexintent_delaychild_work %>
+    <%= form.text_field :sexintent_delaychild_work %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

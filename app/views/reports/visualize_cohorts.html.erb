@@ -1,0 +1,58 @@
+<% content_for :header do %>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['gantt']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('string', 'Resource');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+
+      data.addRows([
+        [ '999', 
+        'Federal Reporting Period', 
+        null, 
+        new Date(2022, 09, 30), 
+        new Date(2023, 09, 30), 
+        null, 
+        <%= (((Date.today - Date.new(2022, 9, 30)) / (Date.new(2023,9,30) - Date.new(2022,9,30))).to_f * 100).to_i %>,
+        null
+        ],
+        <% @scoped_cohorts.each do |cohort| %>
+        [ '<%= cohort.id %>', 
+          "<%= raw cohort.name.gsub("\"", "\\\"") %><%= raw !cohort.extra_name.empty? ? " (" + cohort.extra_name.gsub("\"", "\\\"") + ")" : ""%>" , 
+          '<%= cohort.provider.long_name %>', 
+          new Date(<%= cohort.intended_start.year %>, <%= cohort.intended_start.month - 1 %>, <%= cohort.intended_start.day %>), 
+          new Date(<%= cohort.intended_finish.year %>, <%= cohort.intended_finish.month - 1 %>, <%= cohort.intended_finish.day %>), 
+          null, 
+          <%= ((cohort.session_logs.length.to_f / cohort.intended_session_count.to_f) * 100).to_i %>, 
+          null
+        ]<%= cohort != @scoped_cohorts.last ? "," : "" %>
+        <% end %>
+      ]);
+
+      var options = {
+        height: 1000,
+        gantt: {
+          trackHeight: 30,
+          sortTasks: false
+        },
+        explorer: {axis: 'horizontal', keepInBounds: true}
+      };
+
+      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+  </script>
+<% end %>
+<h1>Cohorts at-a-Glance</h1>
+<div id="chart_div" style="padding-bottom: 100px"></div>

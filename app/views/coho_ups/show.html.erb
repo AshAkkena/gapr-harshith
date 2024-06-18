@@ -1,0 +1,11 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Cohort:</strong>
+  <%= @coho_up.cohort_id %>
+</p>
+
+<p><b>Magic Code:</b><%= @coho_up.magic_code %></p>
+
+<%= link_to 'Edit', edit_coho_up_path(@coho_up) %> |
+<%= link_to 'Back', coho_ups_path %>

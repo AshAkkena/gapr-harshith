@@ -1,0 +1,37 @@
+<% content_for :header do %>
+  <script>
+    function doCopyText() {
+      /* Get the text field */
+      var copyText = document.getElementById("copyThis");
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+       /* Copy the text inside the text field */
+      navigator.clipboard.writeText(copyText.value);
+
+      $('#copyTooltip').fadeIn("fast");
+      $('#copyTooltip').fadeOut(3000)
+    } 
+  </script>
+<% end %>
+<p id="notice"><%= notice %></p>
+
+<div class="d-print-none">
+  <h1>Cohort Facilitation</h1>
+  <input type="text" readonly="true" value="<%= new_session_log_url(magic_code: @cohort.coho_up.magic_code)%>" id="copyThis" hidden="hidden" />
+</div>
+<div class="d-none d-print-block">
+  <h1 style="text-align: center">Georgia PREP</h1>
+</div>
+<div class="d-flex flex-column justify-content-center align-items-center">
+  <div><h2 style="text-align: center">New Session Log<br /><%= @cohort.name %> (<%= @cohort.extra_name %>)</h2></div>
+  <div style="padding-top: 10px; padding-bottom: 10px"><%= RQRCode::QRCode.new(new_session_log_url(magic_code: @cohort.coho_up.magic_code)).as_svg(offet: 0, color: '000', shape_rendering: 'crisp_edges', module_size: 6).html_safe %></div>
+  <div class="d-print-none"><button onclick="doCopyText()" id="copyLinkButton">Copy Link</button></div>
+  <div class="d-print-none"><p>&nbsp;<span style="color: green; display: none" id="copyTooltip" role="tooltip">Link copied!</span>&nbsp;</p></div>
+</div>
+<div>
+  <p style="text-align: center">Treat this code and link like a password. Keep them in a safe place!<br />They allow for entering data without a login.<br />
+  <b>If these are compromised, note the date and time it happened and contact the Evaluation Team.</b></p>
+</div>

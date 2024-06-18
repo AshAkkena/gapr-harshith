@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @handout.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @handout.description %>
+</p>
+
+<%= link_to 'Edit', edit_handout_path(@handout) %> |
+<%= link_to 'Back', handouts_path %>

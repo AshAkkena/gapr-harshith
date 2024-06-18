@@ -1,0 +1,484 @@
+<h1>Survey Results</h1>
+<% if @provider.present? %>
+  <p><%= @provider.long_name %> from <%= @window_start.strftime("%b %-d %Y") %> to <%= @window_stop.strftime("%b %-d %Y") %>
+<% else %>
+  <p>Statewide from <%= @window_start.strftime("%b %-d %Y") %> to <%= @window_stop.strftime("%b %-d %Y") %>
+<% end %>
+<h2>Entry Survey</h2>
+<p>For this provider, during this period, <%= @results_entry[:total_all].to_s %> entry surveys were recorded.</p>
+<% if @results_entry[:total_all] >= 5 %>
+  <table class="apa">
+    <caption>"I understand what makes a relationship healthy."</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Not at all true of me</td>
+      <td><%= @results_entry[:relate_healthy_not] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_healthy_not] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat true of me</td>
+      <td><%= @results_entry[:relate_healthy_somewhat] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_healthy_somewhat] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Very true of me</td>
+      <td><%= @results_entry[:relate_healthy_very] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_healthy_very] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_entry[:relate_healthy_missing] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_healthy_missing] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"I would be able to resist or say no to someone if they pressured me to participate in acts, such as kissing, touching private parts, or sex."</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Not at all true of me</td>
+      <td><%= @results_entry[:relate_resist_not] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_resist_not] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat true of me</td>
+      <td><%= @results_entry[:relate_resist_somewhat] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_resist_somewhat] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Very true of me</td>
+      <td><%= @results_entry[:relate_resist_very] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_resist_very] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_entry[:relate_resist_missing] %></td>
+      <td><%= (100.to_f * @results_entry[:relate_resist_missing] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"If (I) had sexual intercourse in the past 3 months, how often did (I) or a partner use a condom?"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>I have never had sex.</td>
+      <td><%= @results_entry[:condom_neversex] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_neversex] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>I have not had sex recently.</td>
+      <td><%= @results_entry[:condom_notrecently] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_notrecently] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Always</td>
+      <td><%= @results_entry[:condom_always] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_always] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Mostly</td>
+      <td><%= @results_entry[:condom_mostly] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_mostly] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Sometimes</td>
+      <td><%= @results_entry[:condom_sometimes] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_sometimes] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Never</td>
+      <td><%= @results_entry[:condom_never] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_never] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(Not asked)</td>
+      <td><%= @results_entry[:condom_middle] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_middle] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_entry[:condom_missing] %></td>
+      <td><%= (100.to_f * @results_entry[:condom_missing] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"If (I) had sexual intercourse in the past 3 months, how often did (I) or a partner use birth control OTHER than condoms?<br /><i>By birth control, we mean methods that can prevent pregnancy, like using birth control pills, the shot, the patch, the ring, IUD, or implant.</i>"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>I have never had sex.</td>
+      <td><%= @results_entry[:contraceptive_neversex] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_neversex] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>I have not had sex recently.</td>
+      <td><%= @results_entry[:contraceptive_notrecently] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_notrecently] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Always</td>
+      <td><%= @results_entry[:contraceptive_always] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_always] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Mostly</td>
+      <td><%= @results_entry[:contraceptive_mostly] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_mostly] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Sometimes</td>
+      <td><%= @results_entry[:contraceptive_sometimes] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_sometimes] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Never</td>
+      <td><%= @results_entry[:contraceptive_never] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_never] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(Not asked)</td>
+      <td><%= @results_entry[:contraceptive_middle] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_middle] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_entry[:contraceptive_missing] %></td>
+      <td><%= (100.to_f * @results_entry[:contraceptive_missing] / @results_entry[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+<% else %>
+  <p>There are insufficient responses to display aggregate data</p>
+<% end %>
+<h2>Exit Survey</h2>
+<p>For this provider, during this period, <%= @results_exit[:total_all].to_s %> entry surveys were recorded.</p>
+<% if @results_exit[:total_all] >= 5 %>
+  <table class="apa">
+    <caption>"Did discussions or activities help me to learn program lessons?"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>All of the time</td>
+      <td><%= @results_exit[:percep_learn_all] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_learn_all] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Most of the time</td>
+      <td><%= @results_exit[:percep_learn_most] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_learn_most] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Some of the time</td>
+      <td><%= @results_exit[:percep_learn_some] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_learn_some] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>None of the time</td>
+      <td><%= @results_exit[:percep_learn_none] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_learn_none] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No response)</td>
+      <td><%= @results_exit[:percep_learn_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_learn_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+
+  <table class="apa">
+    <caption>"(I) better understand what makes a relationship healthy."</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Much more likely of me</td>
+      <td><%= @results_exit[:impact_relate_healthy_much_more] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_much_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somehwat more likely of me</td>
+      <td><%= @results_exit[:impact_relate_healthy_some_more] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_some_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>About the same</td>
+      <td><%= @results_exit[:impact_relate_healthy_same] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_same] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somehwat less likely of me</td>
+      <td><%= @results_exit[:impact_relate_healthy_some_less] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_some_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much less likely of me</td>
+      <td><%= @results_exit[:impact_relate_healthy_much_less] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_much_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No response)</td>
+      <td><%= @results_exit[:impact_relate_healthy_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_healthy_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+
+  <table class="apa">
+    <caption>"(I) resist or say no to someone if they pressure (me) to participate in acts, such as kissing, touching private parts, or sex"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Much more likely of me</td>
+      <td><%= @results_exit[:impact_relate_resist_much_more] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_much_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somehwat more likely of me</td>
+      <td><%= @results_exit[:impact_relate_resist_some_more] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_some_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>About the same</td>
+      <td><%= @results_exit[:impact_relate_resist_same] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_same] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somehwat less likely of me</td>
+      <td><%= @results_exit[:impact_relate_resist_some_less] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_some_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much less likely of me</td>
+      <td><%= @results_exit[:impact_relate_resist_much_less] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_much_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No response)</td>
+      <td><%= @results_exit[:impact_relate_resist_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:impact_relate_resist_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"Did I have a chance to ask questions about topics or issues that came up in the program?"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Always</td>
+      <td><%= @results_exit[:percep_ask_all] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_ask_all] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Mostly</td>
+      <td><%= @results_exit[:percep_ask_most] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_ask_most] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Sometimes</td>
+      <td><%= @results_exit[:percep_ask_some] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_ask_some] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Never</td>
+      <td><%= @results_exit[:percep_ask_none] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_ask_none] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_exit[:percep_ask_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:percep_ask_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"(I was satisfied with) the amount of information (I) received about abstaining from sex (choosing to not have sex)?"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Very much</td>
+      <td><%= @results_exit[:satisfaction_abstain_very] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_abstain_very] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat</td>
+      <td><%= @results_exit[:satisfaction_abstain_somewhat] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_abstain_somewhat] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>A little</td>
+      <td><%= @results_exit[:satisfaction_abstain_little] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_abstain_little] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Not at all</td>
+      <td><%= @results_exit[:satisfaction_abstain_notatall] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_abstain_notatall] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_exit[:satisfaction_abstain_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_abstain_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"(I) use (or ask (my) partner to use) a condom if (I was) to have sexual intercourse in the next 3 months?"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Not applicable: I do not choose to have sex</td>
+      <td><%= @results_exit[:abstain_notyes_condom_not_applicable] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_not_applicable] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much more likely</td>
+      <td><%= @results_exit[:abstain_notyes_condom_much_more] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_much_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat more likely</td>
+      <td><%= @results_exit[:abstain_notyes_condom_some_more] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_some_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>About the same</td>
+      <td><%= @results_exit[:abstain_notyes_condom_same] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_same] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat less likely</td>
+      <td><%= @results_exit[:abstain_notyes_condom_some_less] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_some_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much less likely</td>
+      <td><%= @results_exit[:abstain_notyes_condom_much_less] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_much_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(Not asked)</td>
+      <td><%= @results_exit[:abstain_notyes_condom_middle] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_middle] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_exit[:abstain_notyes_condom_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_condom_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+  
+  <table class="apa">
+    <caption>"(I) use (or ask (my) partner to use) birth control OTHER than condoms if (I was) to have sexual intercourse in the next 3 months?<br /><i>By birth control, we mean methods that can prevent pregnancy, like using birth control pills, the shot, the patch, the ring, IUD, or implant.</i>"</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Not applicable: I do not choose to have sex</td>
+      <td><%= @results_exit[:abstain_notyes_contra_not_applicable] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_not_applicable] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much more likely</td>
+      <td><%= @results_exit[:abstain_notyes_contra_much_more] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_much_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat more likely</td>
+      <td><%= @results_exit[:abstain_notyes_contra_some_more] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_some_more] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>About the same</td>
+      <td><%= @results_exit[:abstain_notyes_contra_same] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_same] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat less likely</td>
+      <td><%= @results_exit[:abstain_notyes_contra_some_less] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_some_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Much less likely</td>
+      <td><%= @results_exit[:abstain_notyes_contra_much_less] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_much_less] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(Not asked)</td>
+      <td><%= @results_exit[:abstain_notyes_contra_middle] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_middle] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_exit[:abstain_notyes_contra_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:abstain_notyes_contra_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+
+  <table class="apa">
+    <caption>"(I was satisfied with) the amount of information (I) received about condoms and birth control."</caption>
+    <tr>
+      <th>Response</th>
+      <th>Frequency</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>Very much</td>
+      <td><%= @results_exit[:satisfaction_contra_very] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_contra_very] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Somewhat</td>
+      <td><%= @results_exit[:satisfaction_contra_somewhat] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_contra_somewhat] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>A little</td>
+      <td><%= @results_exit[:satisfaction_contra_little] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_contra_little] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>Not at all</td>
+      <td><%= @results_exit[:satisfaction_contra_notatall] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_contra_notatall] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+    <tr>
+      <td>(No Response)</td>
+      <td><%= @results_exit[:satisfaction_contra_missing] %></td>
+      <td><%= (100.to_f * @results_exit[:satisfaction_contra_missing] / @results_exit[:total_all]).to_i.to_s + "%" %></td>
+    </tr>
+  </table>
+<% else %>
+  <p>There are insufficient responses to display aggregate data</p>
+<% end %>

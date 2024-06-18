@@ -1,0 +1,208 @@
+<p id="notice"><%= notice %></p>
+
+<%= render 'snapshot', cohort: @cohort %>
+
+<% if @cohort.coho_down.present? %>
+  <hr />
+  <h2>Official Reach</h2>
+  <div class="container">
+  <%= form_with(model: @cohort.coho_down, local: true) do |f| %>
+    <% if current_user.has_role?(:technician) %>
+      <h3>PMMS</h3>
+      <p>Initiates MS: <%= @cohort.coho_down[:total_initiated_ms] %> </p>
+      <p>Initiates HS: <%= @cohort.coho_down[:total_initiated_hs] %></p>
+      <p>Graduates MS: <%= @cohort.coho_down[:total_graduated_ms] %></p>
+      <p>Graduates HS: <%= @cohort.coho_down[:total_graduated_hs] %></p>
+    <% end %>
+    <h3>PPR</h3>
+    <div class="d-flex flex-column align-items-start">
+      <div class="d-flex flex-column align-items-end">
+        <div class="field">
+          <b><%= f.label :ppr_count_total %></b>
+          <%= f.number_field :ppr_count_total, required: true, min: 0 %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_male %>
+          <%= f.number_field :ppr_count_male, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_female %>
+          <%= f.number_field :ppr_count_female, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_10_13 %>
+          <%= f.number_field :ppr_count_10_13, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_14_19 %>
+          <%= f.number_field :ppr_count_14_19, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_20 %>
+          <%= f.number_field :ppr_count_20, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_preg_par %>
+          <%= f.number_field :ppr_count_preg_par, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_juv_jus %>
+          <%= f.number_field :ppr_count_juv_jus, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_foster %>
+          <%= f.number_field :ppr_count_foster, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_runaway %>
+          <%= f.number_field :ppr_count_runaway, disabled: true %>
+        </div>
+        <div class="field">
+          <%= f.label :ppr_count_lgbt %>
+          <%= f.number_field :ppr_count_lgbt, disabled: true %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  </div>
+  
+  <h2>Official Attendance</h2>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2">
+        <p>Date</p>
+      </div>
+      <div class="col-sm-2">
+        <p>Middle-Schoolers (&lt;18)</p>
+      </div>
+      <div class="col-sm-2">
+        <p><i>New</i> Middle-Schoolers (&lt;18)</p>
+      </div>
+      <div class="col-sm-2">
+        <p>High-Schoolers (&GreaterEqual;18)</p>
+      </div>
+      <div class="col-sm-2">
+        <p><i>New</i> High-Schoolers (&GreaterEqual;18)</p>
+      </div>
+    </div>
+    <% @cohort.coho_down.coho_down_attends.order(:happened_on).each do |coho_down_attends| %>
+    <div class="row">
+      <div class="col-sm-2 field">
+        <p><%= coho_down_attends["happened_on"] %></p>
+      </div>
+      <div class="col-sm-2 field">
+        <p><%= coho_down_attends["middleschool_headcount"] %></p>
+      </div>
+      <div class="col-sm-2 field">
+        <p><%= coho_down_attends["newface_ms_headcount"] %></p>
+      </div>
+      <div class="col-sm-2 field">
+        <p><%= coho_down_attends["highschool_headcount"] %></p>
+      </div>
+      <div class="col-sm-2 field">
+        <p><%= coho_down_attends["newface_hs_headcount"] %></p>
+      </div>
+    </div>
+    <% end %>
+  </div>
+  <% if @cohort.session_logs.present? %>
+    <hr />
+    <h2>Session Logs</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-2">
+          <p>Date</p>
+        </div>
+        <div class="col-sm-2">
+          <p>Receipt</p>
+        </div>
+        <div class="col-sm-2">
+          <p>Middle-Schoolers (&lt;18)</p>
+        </div>
+        <div class="col-sm-2">
+          <p><i>New</i> Middle-Schoolers (&lt;18)</p>
+        </div>
+        <div class="col-sm-2">
+          <p>High-Schoolers (&GreaterEqual;18)</p>
+        </div>
+        <div class="col-sm-2">
+          <p><i>New</i> High-Schoolers (&GreaterEqual;18)</p>
+        </div>
+      </div>
+      <% @cohort.session_logs.order(:happened_on).each do |session_log| %>
+        <div class="row">
+          <div class="col-sm-2 field">
+            <p><%= session_log["happened_on"] %></p>
+          </div>
+          <div class="col-sm-2 field">
+            <p><%= session_log.receipt.attached? ? "✓" : "✗" %></p>
+          </div>
+          <div class="col-sm-2 field">
+            <p><%= session_log["middleschool_headcount"] %></p>
+          </div>
+          <div class="col-sm-2 field">
+            <p><%= session_log["newface_ms_headcount"] %></p>
+          </div>
+          <div class="col-sm-2 field">
+            <p><%= session_log["highschool_headcount"] %></p>
+          </div>
+          <div class="col-sm-2 field">
+            <p><%= session_log["newface_hs_headcount"] %></p>
+          </div>
+        </div>
+       <% end %>
+    </div>
+  <% end %>
+<% else %>
+<% if @cohort.session_logs.present? %>
+  <hr />
+  <h2>Session Logs</h2>
+    <table class="apa">
+      <tr>
+        <th>Meeting Date</th>
+        <th>Enter Date</th>
+        <th colspan="2">
+            <div style="margin-left: 5px; margin-right: 5px">
+              <div class="row">
+                <div style="margin: auto; border-bottom: 1px solid black">N&lt;18</div>
+              </div>
+              <div class="row">
+                <div class="col">Total</div>
+                <div class="col">(New)</div>
+              </div>
+            </div>
+          </th>
+          <th colspan="2">
+            <div style="margin-left: 5px; margin-right: 5px">
+              <div class="row">
+                <div style="margin: auto; border-bottom: 1px solid black">N&GreaterEqual;18</div>
+              </div>
+              <div class="row">
+                <div class="col">Total</div>
+                <div class="col">(New)</div>
+              </div>
+            </div>
+          </th>
+        <th>Receipt</th>
+        <th>Facilitator</th>
+        <th>Delete</th>
+      </tr>
+      <% @cohort.session_logs.order(:happened_on).each do |session_log| %>
+      <tr>
+        <td><%= session_log["happened_on"] %></td>
+        <td><%= Date.parse(session_log["created_at"].to_s) %></td>
+        <td><%= session_log.middleschool_headcount %></td>
+        <td><%= session_log.newface_ms_headcount %></td>
+        <td><%= session_log.highschool_headcount %></td>
+        <td><%= session_log.newface_hs_headcount %></td>
+        <td><%= session_log.receipt.attached? ? "✔" : "✖" %></td>
+        <td><%= session_log["facilitator_initial"] %></td>
+        <td><%= link_to 'Destroy', session_log, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+      <% end %>
+  <% end %>
+<% end %>
+
+
+<%= link_to 'Edit', edit_cohort_path(@cohort) %> |
+<%= link_to 'Back', cohorts_path %>

@@ -1,0 +1,34 @@
+<h1>New Session Log: <%= Cohort.find_by(id: @session_log[:cohort_id])[:name] %> (<%= Cohort.find_by(id: @session_log[:cohort_id])[:extra_name] %>)</h1>
+
+<h2>What's on file?</h2>
+<% if @session_logs.nil? %>
+  <i>Nothing...</i>
+<% else %>
+  <% if @session_logs.empty? %>
+    <i>Nothing...</i>
+  <% else %>
+    <table class="apa">
+    <tr>
+      <th>Date</th>
+      <th>Lessons</th>
+    </tr>
+    <% @session_logs.each do |session_record| %>
+      <tr>
+        <td><%= session_record.happened_on.to_s %></td>
+        <td>
+          <% if session_record.module_lookups.empty? %>
+            <i>None</i>
+          <% else %>
+            <% session_record.module_lookups.each do |my_module| %>
+              <div><%= my_module.abbreviated_curriculum %> <%= my_module.delivery_sequence.to_s %>: <%= my_module.basic_name %></div>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+  <% end %>
+<% end %>
+<%= render 'form', session_log: @session_log %>
+
+<%= link_to 'Back', session_logs_path %>

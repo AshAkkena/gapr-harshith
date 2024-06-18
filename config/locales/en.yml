@@ -1,0 +1,222 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# The following keys must be escaped otherwise they will not be retrieved by
+# the default I18n backend:
+#
+# true, false, on, off, yes, no
+#
+# Instead, surround them with single quotes.
+#
+# en:
+#   'true': 'foo'
+#
+# To learn more, please read the Rails Internationalization guide
+# available at https://guides.rubyonrails.org/i18n.html.
+
+en:
+  hello: "Hello world"
+  activerecord:
+    models:
+      coho_up: "Cohort Activation"
+      coho_down: "Cohort Closure"
+      session_log: "Session Log"
+      cohort: "Cohort"
+      module_lookup: "Curricular Module"
+    attributes:
+      cohort:
+        address: "Address where program will be delivered (if virtual, leave blank)"
+        facilitator: "Main Facilitator / Facilitator of Record"
+        adolescent_development_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        adolescent_development_material_add_curr_entirely: "Added curriculum entirely"
+        adolescent_development_material_evidence_based: "Used evidence-based curriculum"
+        adolescent_development_material_original_content: "Included original content"
+        covered_adolescent_development: "Topic covered"
+        covered_edu_career_success: "Topic covered"
+        covered_financial_literacy: "Topic covered"
+        covered_healthy_life_skills: "Topic covered"
+        covered_healthy_relationship: "Topic covered"
+        covered_par_child_comm: "Topic covered"
+        curriculum_choice: "Curriculum Used"
+        edu_career_success_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        edu_career_success_material_add_curr_entirely: "Added curriculum entirely"
+        edu_career_success_material_evidence_based: "Used evidence-based curriculum"
+        edu_career_success_material_original_content: "Included original content"
+        extra_name: "Name Suffix / Cohort Name"
+        financial_literacy_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        financial_literacy_material_add_curr_entirely: "Added curriculum entirely"
+        financial_literacy_material_evidence_based: "Used evidence-based curriculum"
+        financial_literacy_material_original_content: "Included original content"
+        healthy_life_skills_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        healthy_life_skills_material_add_curr_entirely: "Added curriculum entirely"
+        healthy_life_skills_material_evidence_based: "Used evidence-based curriculum"
+        healthy_life_skills_material_original_content: "Included original content"
+        healthy_relationship_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        healthy_relationship_material_add_curr_entirely: "Added curriculum entirely"
+        healthy_relationship_material_evidence_based: "Used evidence-based curriculum"
+        healthy_relationship_material_original_content: "Included original content"
+        intended_finish: "Finish date"
+        intended_participants_hs: "Intended # adult participants (≥18)"
+        intended_participants_ms: "Intended # youth participants (<18)"
+        intended_session_count: "# Sessions"
+        intended_session_duration_minute: "Session length (minutes)"
+        intended_setting: "Main setting"
+        intended_start: "Start date"
+        name: "Name / Site Name"
+        par_child_comm_material_add_curr_adhoc: "Added curriculum ad-hoc"
+        par_child_comm_material_add_curr_entirely: "Added curriculum entirely"
+        par_child_comm_material_evidence_based: "Used evidence-based curriculum"
+        par_child_comm_material_original_content: "Included original content"
+        period: "Period"
+        provider_id: "Provider"
+        target_adjudicated: "In Adjudication Systems"
+        target_african_american: "African-American"
+        target_dropout: "Dropout"
+        target_foster: "Foster"
+        target_highneed_geo: "In High-Need Areas"
+        target_hiv_aids: "With HIV/AIDS"
+        target_homeless_runaway: "Are Homeless/Runaway"
+        target_latino: "Latino/a"
+        target_male: "Male"
+        target_mental_health: "In Mental Healthcare"
+        target_native_american: "Native American"
+        target_pregnant_parenting: "Pregnant/Parenting"
+        target_trafficked: "Trafficked"
+        uses_enrollment: "Uses GaPR for enrollment tracking (registration)"
+      coho_up:
+        cohort_id: "Associated Cohort"
+        ppr_count_total: "# Total"
+        ppr_count_male: "# Male"
+        ppr_count_female: "# Female"
+        ppr_count_10_13: "# Ages 10-13"
+        ppr_count_14_19: "# Ages 14-19"
+        ppr_count_20: "# Ages 20+"
+        ppr_count_preg_par: "# Pregnant and Parenting"
+        ppr_count_juv_jus: "# in juvenile justice"
+        ppr_count_foster: "# in foster care"
+        ppr_count_runaway: "# runaway and homeless"
+        ppr_count_lgbt: "# lesbian, gay, bisexual, transgendered"
+      coho_down:
+        total_graduated_ms: "Total Graduates (<18)"
+        total_graduated_hs: "Total Graudates (≥18)"
+        total_initiated_ms: "Total Initiates (<18)"
+        total_initiated_hs: "Total Initiates (≥18)"
+        total_hours_delivered: "Total Hours Delivered"
+        program_complete: "Note if all programming was delivered: "
+        rationale: "If not, why? (255 character limit)"
+        census_foster: "Out of all initiated participants, how many were known to be in foster-care situations?"
+        census_homeless: "Out of all initiated participants, how many were known to be homeless or runaways?"
+        census_pregnant_parenting: "Out of all initiated participants, how many were known to be pregnant or parenting?"
+        census_adjudication: "Out of all initiated participants, how many were known to be in adjudication systems?"
+        main_setting: "What was the MAIN setting for program delivery?"
+        covid_virtualization: "Note if programming was delivered virtually as a result of the impacts of COVID-19: "
+        ppr_count_total: "# Total"
+        ppr_count_male: "# Male"
+        ppr_count_female: "# Female"
+        ppr_count_10_13: "# Ages 10-13"
+        ppr_count_14_19: "# Ages 14-19"
+        ppr_count_20: "# Ages 20+"
+        ppr_count_preg_par: "# Pregnant and Parenting"
+        ppr_count_juv_jus: "# in juvenile justice"
+        ppr_count_foster: "# in foster care"
+        ppr_count_runaway: "# runaway and homeless"
+        ppr_count_lgbt: "# lesbian, gay, bisexual, transgendered"
+        middleschool: "Youth (<18)"
+        highschool: "Adult (≥18)"
+      session_log:
+        period: "Reporting Period"
+        magic_code: "Lookup Code"
+        cohort_id: "Cohort ID"
+        happened_on: "Session Date"
+        minutes_taught: "Session Duration (Minutes)"
+        middleschool: "Youth (<18)"
+        highschool: "Adult (≥18)"
+        middleschool_headcount: "Total youth participants (<18)"
+        highschool_headcount: "Total adult participants (≥18)"
+        newface_ms_headcount: "New youth participants (<18)"
+        newface_hs_headcount: "New adult participants (≥18)"
+        facilitator_initial: "Facilitator Initials"
+        participantion_proportion: "Overall Participation"
+        interest_proportion: "Overall Interest"
+        enough_time: "Sufficient Time"
+        taught_everything: "Everything Taught"
+        adapted_anything: "Any Adaptations Made (leave blank if none)"
+        participant_referal: "Any Participant Referals to Services"
+        impl_setting: "Main Implementation Setting"
+      staff_training_survey:
+        affiliation: "What is the BEST description of your organizational affiliation?"
+        quality_interest: "The training held my interest."
+        quality_relevance: "The training content was relevant to my work."
+        quality_will_use: "I will use what I learned from the training in my work."
+        quality_will_share: "I will share what I learned from the training with my colleagues."
+        quality_will_recommend: "I will recommend the training to my colleagues."
+        details_good: "What aspect of this training was especially good?"
+        details_improvement: "What needed the most improvement?"
+      provider:
+        period: "Reporting Period"
+        long_name: "Provider Name"
+        pmms_aggregate_name: "PMMS Aggregate Provider"
+        provider_new: "Provider was new for the reporting period"
+        provider_served_youth: "Provider served youth during the current reporting period"
+        using_optpout: "Provider used opt-out registration and/or parent permission"
+        award_amount: "PREP award amount for current reporting period"
+        nonprep_funding: "Amount of non-PREP funding received during current reporting period to support PREP programming"
+        staffing_administering: "Number of provider staff involved in administering PREP programs"
+        staffing_administrative_covid_vacancies_ever: "Number of provider administrative staff vacancies due to COVID-19"
+        staffing_administrative_covid_vacancies_filled: "Number of vacancies filled by the end of the reporting period"
+        staffing_fte_administering: "Number of provider FTE involved in overseeing PREP"
+        staffing_fte_administering_covid_vacancies_ever: "Number of provider PREP administrative staff FTEs vacant due to COVID-19"
+        staffing_fte_administering_covid_vacancies_filled: "Number of vacant FTEs filled by the end of the reporting period"
+        facilitators_total: "Number of PREP facilitators working for provider"
+        facilitators_covid_vacancies_ever: "Number of PREP facilitator staff vacancies due to COVID-19"
+        facilitators_covid_vacancies_filled: "Number of vacancies filled by the end of the reporting period"
+        facilitators_trained_core_model: "Number of PREP facilitators trained in delivering core program model"
+        facilitators_observed_just_once: "Number of PREP facilitators observed exactly once"
+        facilitators_observed_twice_more: "Number of PREP facilitators observed twice or more"
+        challenges_recruiting_youth: "Recruiting youth"
+        challenges_engagement: "Keeping youth engaged"
+        challenges_attendance: "Getting youth to attend regularly"
+        challenges_recruiting_staff: "Recruiting qualified staff"
+        challenges_staff_understanding: "Ensuring facilitators understand content"
+        challenges_covering_content: "Covering program content"
+        challenges_turnover: "Staff turnover"
+        challenges_negative_peer_interactions: "Negative peer reactions"
+        challenges_youth_behavioral: "Youth behavioral problems"
+        challenges_facilities: "Natural disasters"
+        challenges_natural_disasters: "Program facilities"
+        challenges_stakeholder_support: "Obtaining buy-in or support from key stakeholders"
+        tta_recruiting_youth: "Recruiting youth"
+        tta_engagement: "Keeping youth engaged in program sessions"
+        tta_attendance: "Getting youth to attend regularly"
+        tta_recruiting_staff: "Recruiting qualified staff"
+        tta_training_facilitators: "Training facilitators"
+        tta_retaining_staff: "Retaining staff"
+        tta_minimize_negative_peer: "Minimizing negative peer reactions"
+        tta_addressing_behavior: "Addressing youth behavioral issues"
+        tta_obtaining_support: "Obtaining buy-in or support from key stakeholders"
+        tta_evaluation: "Evaluation"
+        tta_parent_support: "Parent support and engagement"
+        tta_other_text: "(Please specify)"
+        tta_other_rating: "Other"
+        done: "These data are complete and accurate. All done!"
+    errors:
+      models:
+        coho_up:
+          attributes:
+            cohort_id:
+              blank: "is required. Try creating the activation from the Cohort Overview."

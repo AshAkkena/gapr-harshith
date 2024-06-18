@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Enrollment:</strong>
+  <%= @enrollment_session_log.enrollment_id %>
+</p>
+
+<p>
+  <strong>Session log:</strong>
+  <%= @enrollment_session_log.session_log_id %>
+</p>
+
+<%= link_to 'Edit', edit_enrollment_session_log_path(@enrollment_session_log) %> |
+<%= link_to 'Back', enrollment_session_logs_path %>

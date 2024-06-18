@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Cohort:</strong>
+  <%= @coho_down_attend.coho_down.cohort_id %>
+</p>
+
+<p>
+  <strong>Happened on:</strong>
+  <%= @coho_down_attend.happened_on %>
+</p>
+
+<p>
+  <strong>Middleschool headcount:</strong>
+  <%= @coho_down_attend.middleschool_headcount %>
+</p>
+
+<p>
+  <strong>Highschool headcount:</strong>
+  <%= @coho_down_attend.highschool_headcount %>
+</p>
+
+<p>
+  <strong>Newface ms headcount:</strong>
+  <%= @coho_down_attend.newface_ms_headcount %>
+</p>
+
+<p>
+  <strong>Newface hs headcount:</strong>
+  <%= @coho_down_attend.newface_hs_headcount %>
+</p>
+
+<%= link_to 'Edit', edit_coho_down_attend_path(@coho_down_attend) %> |
+<%= link_to 'Back', coho_down_attends_path %>

@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cohort: one
+  total_graduated_ms: 1
+  total_graduated_hs: 1
+  total_initiated_ms: 1
+  total_initiated_hs: 1
+  total_hours_delivered: 1
+  program_complete: false
+  census_foster: 1
+  census_homeless: 1
+  census_pregnant_parenting: 1
+  census_adjudication: 1
+  main_setting: MyString
+  covid_virtualization: false
+
+two:
+  cohort: two
+  total_graduated_ms: 1
+  total_graduated_hs: 1
+  total_initiated_ms: 1
+  total_initiated_hs: 1
+  total_hours_delivered: 1
+  program_complete: false
+  census_foster: 1
+  census_homeless: 1
+  census_pregnant_parenting: 1
+  census_adjudication: 1
+  main_setting: MyString
+  covid_virtualization: false

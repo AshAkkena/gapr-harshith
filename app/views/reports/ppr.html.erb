@@ -1,0 +1,144 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    //$(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+
+<h1>Range selection</h1>
+      <div class="field">
+        <%= form_tag(ppr_path, method: :get) do %>
+          <%= text_field_tag :start, params[:start], required: true, class: "datepicker" %>
+          <%= text_field_tag :stop, params[:stop], required: true, class: "datepicker" %>
+          <%= submit_tag ("Go") %>
+        <% end %>
+      </div>
+
+<h1 style="text-align: center">Personal Responsibility Education Program<br />SAMPLE PROGRAM INDICATORS CHART<br />Attachment 2<br /></h1>
+<p>Please note: realtime data are subject to change and cleaning.</p>
+
+<p><b>Grantee:</b> GA-PREP<br />
+<b>Grant:</b> GA-PREP<br />
+<b>Activity Period:</b> <%= @window_start.strftime("%-m/%-d/%Y") %> - <%= @window_stop.strftime("%-m/%-d/%Y") %><br />
+<b>Community Based Organization Participant Data</b> <%= link_to "Download", get_ppr_csv_cbo_path(start: @window_start, stop: @window_stop) %></p>
+
+<table class="apa">
+<tr>
+  <th>Site or Implementation Provider</th>
+  <th>Total # Initiated</th>
+  <th>Total # Completed</th>
+  <th># Male</th>
+  <th># Female</th>
+  <th># Ages 10 to 14</th>
+  <th># Ages 15 to 19</th>
+  <th># Ages 20</th>
+  <th># Pregnant and Parenting</th>
+  <th>#JJ</th>
+  <th>#FC</th>
+  <th>#RHY</th>
+  <th>#LGBT</th>
+</tr>
+<% @cbo_data.each do |cbo| %>
+  <tr>
+    <td><b><%= cbo[:n_provider] %></b><br /><%= cbo[:n_site] %><%= cbo[:n_unclosed] ? "*" : "" %></td>
+    <td><%= cbo[:n_initiated] %></td>
+    <td><%= cbo[:n_graduated] %></td>
+    <td><%= cbo[:n_male] %></td>
+    <td><%= cbo[:n_female] %></td>
+    <td><%= cbo[:n_10] %></td>
+    <td><%= cbo[:n_14] %></td>
+    <td><%= cbo[:n_20] %></td>
+    <td><%= cbo[:n_preg] %></td>
+    <td><%= cbo[:n_justice] %></td>
+    <td><%= cbo[:n_foster] %></td>
+    <td><%= cbo[:n_runaway] %></td>
+    <td><%= cbo[:n_lgbt] %></td>
+  </tr>
+<% end %>
+  <tr>
+    <td><b><span style="color: red">Total</span></b></td>
+    <td><b><%= @cbo_data.pluck(:n_initiated).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_graduated).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_male).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_female).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_10).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_14).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_20).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_preg).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_justice).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_foster).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_runaway).sum %></b></td>
+    <td><b><%= @cbo_data.pluck(:n_lgbt).sum %></b></td>
+  </tr>
+</table>
+<p>* Contains data from unclosed (usually ongoing) cohorts</p>
+<p>JJ - youth in juvenile justice<br />
+FC - Youth in foster care<br />
+RHY - Runaway and homeless youth<br />
+LGBT - Lesbian, gay, bisexual, transgendered youth
+</p>
+
+
+<p><b>Grantee:</b> GA-PREP<br />
+<b>Grant:</b> GA-PREP<br />
+<b>Activity Period:</b> <%= @window_start.strftime("%-m/%-d/%Y") %> - <%= @window_stop.strftime("%-m/%-d/%Y") %><br />
+<b>Georgia Department of Public Health Participant Data</b> <%= link_to "Download", get_ppr_csv_ahyd_path(start: @window_start, stop: @window_stop) %></p>
+
+<table class="apa">
+<tr>
+  <th>Site or Implementation Provider</th>
+  <th>Total # Initiated</th>
+  <th>Total # Completed</th>
+  <th># Male</th>
+  <th># Female</th>
+  <th># Ages 10 to 14</th>
+  <th># Ages 15 to 19</th>
+  <th># Ages 20</th>
+  <th># Pregnant and Parenting</th>
+  <th>#JJ</th>
+  <th>#FC</th>
+  <th>#RHY</th>
+  <th>#LGBT</th>
+</tr>
+<% @ahyd_data.each do |ahyd| %>
+  <tr>
+    <td><b><%= ahyd[:n_provider] %></b><br /><%= ahyd[:n_site] %><%= ahyd[:n_unclosed] ? "*" : "" %></td>
+    <td><%= ahyd[:n_initiated] %></td>
+    <td><%= ahyd[:n_graduated] %></td>
+    <td><%= ahyd[:n_male] %></td>
+    <td><%= ahyd[:n_female] %></td>
+    <td><%= ahyd[:n_10] %></td>
+    <td><%= ahyd[:n_14] %></td>
+    <td><%= ahyd[:n_20] %></td>
+    <td><%= ahyd[:n_preg] %></td>
+    <td><%= ahyd[:n_justice] %></td>
+    <td><%= ahyd[:n_foster] %></td>
+    <td><%= ahyd[:n_runaway] %></td>
+    <td><%= ahyd[:n_lgbt] %></td>
+  </tr>
+<% end %>
+  <tr>
+    <td><b><span style="color: red">Total</span></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_initiated).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_graduated).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_male).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_female).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_10).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_14).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_20).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_preg).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_justice).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_foster).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_runaway).sum %></b></td>
+    <td><b><%= @ahyd_data.pluck(:n_lgbt).sum %></b></td>
+  </tr>
+</table>
+<p>* Contains data from unclosed (usually ongoing) cohorts</p>
+<p>JJ - youth in juvenile justice<br />
+FC - Youth in foster care<br />
+RHY - Runaway and homeless youth<br />
+LGBT - Lesbian, gay, bisexual, transgendered youth
+</p>

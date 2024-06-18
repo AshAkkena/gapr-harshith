@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Coho Ups</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Period</th>
+      <th>Provider</th>
+      <th colspan="2">Cohort</th>
+      <th>Magic code</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @coho_ups.each do |coho_up| %>
+      <tr>
+        <td><%= coho_up.cohort.period %></td>
+        <td><%= coho_up.cohort.provider.long_name %></td>
+        <td><%= coho_up.cohort.name %></td>
+        <td><%= coho_up.cohort.extra_name %></td>
+        <td><%= coho_up.magic_code %></td>
+        <td><%= link_to 'Show', coho_up %></td>
+        <td><%= link_to 'Edit', edit_coho_up_path(coho_up) %></td>
+        <td><%= link_to 'Destroy', coho_up, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Coho Up', new_coho_up_path %>

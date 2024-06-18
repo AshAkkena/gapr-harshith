@@ -1,0 +1,29 @@
+<h1>PMMS Participant Survey Reports</h1>
+<p>Select a report below</p>
+<p> Note: You can select date range  in the next page </p>
+<table class="apa">
+  <tr>
+    <th>PMMS Provider</th>
+    <th colspan="4">
+      <div class="row" style="border-bottom: 1px solid black">
+        <div class="col">PMMS Programs</div>
+      </div>
+      <div class="row">
+        <div class="col">MAD</div>
+        <div class="col">MPC</div>
+        <div class="col">BPBRBP</div>
+        <div class="col">LN</div>
+      </div>
+    </th>
+  </tr>
+  <% @index_table.each do |r| %>
+    <tr>
+      <td><%= r[:pool] %></td>
+      <td><%= r[:countMAD] > 0 ? link_to("✓", participant_surveys_path(provider_id: r[:pid], curriculum_initials: "MAD")): "—" %></td>
+      <td><%= r[:countMPC] > 0 ? link_to("✓", participant_surveys_path(provider_id: r[:pid], curriculum_initials: "MPC")): "—" %></td>
+      <td><%= r[:countBPBRBP] > 0 ? link_to("✓", participant_surveys_path(provider_id: r[:pid], curriculum_initials: "BPBRBP")): "—" %></td>
+      <td><%= r[:countLN] > 0 ? link_to("✓", participant_surveys_path(provider_id: r[:pid], curriculum_initials: "LN")): "—" %></td>
+    </tr>
+  <% end %>
+</table>
+<p>If cohorts were observed for the provider and curriculum during the period, then a report link will be generated.<br />There may or may not be surveys within that report.</p>

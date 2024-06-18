@@ -1,0 +1,39 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period: 1
+  magic_code: MyString
+  cohort: one
+  happened_on: 2021-09-01
+  minutes_taught: 1
+  middleschool_headcount: 1
+  highschool_headcount: 1
+  newface_ms_headcount: 1
+  newface_hs_headcount: 1
+  facilitator_initial: MyString
+  participantion_proportion: MyString
+  interest_proportion: MyString
+  enough_time: MyString
+  taught_everything: false
+  adapted_anything: false
+  participant_referal: false
+  impl_setting: MyString
+
+two:
+  period: 1
+  magic_code: MyString
+  cohort: two
+  happened_on: 2021-09-01
+  minutes_taught: 1
+  middleschool_headcount: 1
+  highschool_headcount: 1
+  newface_ms_headcount: 1
+  newface_hs_headcount: 1
+  facilitator_initial: MyString
+  participantion_proportion: MyString
+  interest_proportion: MyString
+  enough_time: MyString
+  taught_everything: false
+  adapted_anything: false
+  participant_referal: false
+  impl_setting: MyString

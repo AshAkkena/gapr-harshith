@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Fingerprint:</strong>
+  <%= @incentive.fingerprint %>
+</p>
+
+<p>
+  <strong>Period:</strong>
+  <%= @incentive.period %>
+</p>
+
+<%= link_to 'Edit', edit_incentive_path(@incentive) %> |
+<%= link_to 'Back', incentives_path %>

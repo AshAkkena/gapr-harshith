@@ -1,0 +1,282 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    //$(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+<h1>Range selection</h1>
+      <div class="field">
+        <%= form_tag(outcomes_dashboard_path(provider_id: params[:provider_id], curriculum_initials: params[:curriculum_initials]), method: :get) do %>
+          <%= text_field_tag :start, params[:start], required: true, class: "datepicker" %>
+          <%= text_field_tag :stop, params[:stop], required: true, class: "datepicker" %>
+          <%= submit_tag ("Go") %>
+        <% end %>
+      </div>
+
+<h1>Outcomes Dashboard</h1>
+<p>This dashboard includes data from cohorts based on your individual filters and a time range of <%= @window_start %> to <%= @window_stop %>. If a cohort delivered instruction during that window, then it and all of its recorded surveys form part of this report.</p>
+
+<h1>Activities</h1>
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Provider</th>
+      <th colspan="2">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Cohorts</div></div>
+        <div class="row">
+          <div class="col">Started</div>
+          <div class="col">Finished</div>
+        </div>
+      </th>
+      <th colspan="2">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Total</div></div>
+        <div class="row">
+          <div class="col">Initiates</div>
+          <div class="col">Graduates</div>
+        </div>
+      </th>
+      <th>Graduation Rate</th>
+      <th colspan="2">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Entry Survey</div></div>
+        <div class="row">
+          <div class="col">Completed</div>
+          <div class="col">Coverage</div>
+        </div>
+      </th>
+      <th colspan="2">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Exit Survey</div></div>
+        <div class="row">
+          <div class="col">Completed</div>
+          <div class="col">Coverage</div>
+        </div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @poolNames.each do |pool| %>
+      <% if @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).length > 1 %>
+        <tr>
+          <td><%= pool[0] + " " + pool[1].to_s %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).length %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).length %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum %></td>
+          <td><%= (@included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum.to_f * 100).to_i > 100 ? "100%" : (@included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum.to_f * 100).to_i.to_s + "%" %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum %></td>
+          <td><%= (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i.to_s + "%" %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum %></td>
+          <td><%= (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i.to_s + "%" %></td>
+        </tr>
+        <% @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).each do |provider| %>
+          <tr>
+            <td><%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? " └ " : " ├ ") + provider.long_name %></td>
+            <td><%= @included_cohorts.where(provider_id: provider.id).length %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).length %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum %></td>
+            <td><%= (@included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i.to_s + "%" %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).map{|i| i.entry_surveys.length}.sum %></td>
+            <td><%= (@included_cohorts.where(id: provider.cohort_ids).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(id: provider.cohort_ids).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i.to_s + "%" %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.length}.sum %></td>
+            <td><%= (@included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: provider.cohort_ids).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i.to_s + "%" %></td>
+          </tr>
+              <% @included_cohorts.where(provider_id: provider.id).each do |cohort| %>
+                <tr>
+                  <td>
+                    <%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? "  " : " │") + (cohort == (@included_cohorts.where(provider_id: provider.id).last) ? "   └ " : "   ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td><%= (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs) %></td>
+                  <td><%= (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs) %></td>
+                  <td><%= ((cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs).to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)) > 100 ? "100%" : ((cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs).to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)).to_i.to_s + "%" %></td>
+                  <td><%= cohort.entry_surveys.length %></td>
+                  <td><%= (cohort.entry_surveys.length.to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)) > 100 ? "100%" : (cohort.entry_surveys.length.to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)).to_i.to_s + "%" %></td>
+                  <td><%= cohort.exit_surveys.length %></td>
+                  <td><%= (cohort.exit_surveys.length.to_f*100 / (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs)) > 100 ? "100%" : (cohort.exit_surveys.length.to_f*100 / (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs)).to_i.to_s + "%" %></td>
+                </tr>
+              <% end %>
+        <% end %>
+      <% else %>
+        <tr>
+          <td><%= pool[0] + " " + pool[1].to_s %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).length %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).length %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+          <td><%= @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum %></td>
+          <td><%= (@included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum.to_f * 100).to_i > 100 ? "100%" : (@included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum.to_f * 100).to_i.to_s + "%" %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum %></td>
+          <td><%= (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum * 100).to_i.to_s + "%" %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum %></td>
+          <td><%= (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i > 100 ? "100%" : (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum.to_f / @included_cohorts.where(id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).map{|i| i.cohort_ids}.flatten.sort.uniq).joins(:coho_down).map{|i| i.coho_down.total_graduated_ms + i.coho_down.total_graduated_hs}.sum * 100).to_i.to_s + "%" %></td>
+        </tr>
+        <% @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).each do |cohort| %>
+          <tr>
+            <td>
+              <%= (cohort == (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id))).last ? " └ " : " ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+            </td>
+            <td></td>
+            <td></td>
+            <td><%= (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs) %></td>
+            <td><%= (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs) %></td>
+            <td><%= ((cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs).to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)) > 100 ? "100%" : ((cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs).to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)).to_i.to_s + "%" %></td>
+            <td><%= cohort.entry_surveys.length %></td>
+            <td><%= (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs) > 0 ? ((cohort.entry_surveys.length.to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)) > 100 ? "100%" : (cohort.entry_surveys.length.to_f*100 / (cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs)).to_i.to_s + "%") : "—" %></td>
+            <td><%= cohort.exit_surveys.length %></td>
+            <td><%= (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs) > 0 ? ((cohort.exit_surveys.length.to_f*100 / (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs)) > 100 ? "100%" : (cohort.exit_surveys.length.to_f*100 / (cohort.coho_down.total_graduated_ms + cohort.coho_down.total_graduated_hs)).to_i.to_s + "%") : "—" %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+
+<h1>Outcomes</h1>
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Provider</th>
+      <th colspan="2">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Surveys</div></div>
+        <div class="row">
+          <div class="col">Entry</div>
+          <div class="col">Exit</div>
+        </div>
+      </th>
+      <th colspan="3">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Abstain</div></div>
+        <div class="row">
+          <div class="col">Saw</div>
+          <div class="col">Said</div>
+          <div class="col">%</div>
+        </div>
+      </th>
+      <th colspan="3">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Delay</div></div>
+        <div class="row">
+          <div class="col">Saw</div>
+          <div class="col">Said</div>
+          <div class="col">%</div>
+        </div>
+      </th>
+      <th colspan="3">
+        <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Protect</div></div>
+        <div class="row">
+          <div class="col">Saw</div>
+          <div class="col">Said</div>
+          <div class="col">%</div>
+        </div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @poolNames.each do |pool| %>
+      <% if @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).length > 1 %>
+        <tr>
+          <td><%= pool[0] + " " + pool[1].to_s %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum %></td>
+          <%# PROVIDER-LEVEL FOR POOLED %>
+          <%# ABSTAIN %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+          <%# DELAY %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+          <%# PROTECT %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+        </tr>
+        <% @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).each do |provider| %>
+          <tr>
+            <td><%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? " └ " : " ├ ") + provider.long_name %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).map{|i| i.entry_surveys.length}.sum %></td>
+            <td><%= @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.length}.sum %></td>
+            <%# ABSTAIN %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+            <%# DELAY %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+            <%# PROTECT %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(id: provider.cohort_ids).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+          </tr>
+              <% @included_cohorts.where(provider_id: provider.id).each do |cohort| %>
+                <tr>
+                  <td>
+                    <%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? "  " : " │") + (cohort == (@included_cohorts.where(provider_id: provider.id).last) ? "   └ " : "   ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+                  </td>
+                  <td><%= cohort.entry_surveys.length %></td>
+                  <td><%= cohort.exit_surveys.length %></td>
+                  <%# ABSTAIN %>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length %></td>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, magic: cohort.coho_up.magic_code).length %></td>
+                  <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, magic: cohort.coho_up.magic_code).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+                  <%# DELAY %>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length %></td>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], magic: cohort.coho_up.magic_code).length %></td>
+                  <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], magic: cohort.coho_up.magic_code).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+                  <%# PROTECT %>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length %></td>
+                  <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], magic: cohort.coho_up.magic_code).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], magic: cohort.coho_up.magic_code)).uniq.length %></td>
+                  <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], magic: cohort.coho_up.magic_code).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], magic: cohort.coho_up.magic_code)).uniq.length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+                </tr>
+              <% end %>
+        <% end %>
+      <% else %>
+        <tr>
+          <td><%= pool[0] + " " + pool[1].to_s %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.length}.sum %></td>
+          <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.length}.sum %></td>
+          <%# PROVIDER-LEVEL FOR NON-POOLED %>
+          <%# ABSTAIN %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+          <%# DELAY %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+          <%# PROTECT %>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+          <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+          <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.exit_surveys.pluck(:id)}.flatten.sort.uniq).length)).to_i.to_s + "%" %></td>
+        </tr>
+        <% @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).each do |cohort| %>
+          <tr>
+            <td>
+              <%= (cohort == (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id))).last ? " └ " : " ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+            </td>
+            <td><%= cohort.entry_surveys.length %></td>
+            <td><%= cohort.exit_surveys.length %></td>
+            <%# NON-POOLED COHORTS %>
+            <%# ABSTAIN %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, magic: cohort.coho_up.magic_code).length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: 1, magic: cohort.coho_up.magic_code).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+            <%# DELAY %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], magic: cohort.coho_up.magic_code).length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_havesex: [4, 5], magic: cohort.coho_up.magic_code).length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+            <%# PROTECT %>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length %></td>
+            <td><%= @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], magic: cohort.coho_up.magic_code).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], magic: cohort.coho_up.magic_code)).uniq.length %></td>
+            <td><%= ((@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_condom: [2, 3], magic: cohort.coho_up.magic_code).or(@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], abstain_notyes_contra: [2, 3], magic: cohort.coho_up.magic_code)).uniq.length * 100.to_f) / (@included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length == 0 ? 1 : @included_exit.where(screen_grade: [6, 7, 8, 9, 10], plan_abstainsex: [2, 3], magic: cohort.coho_up.magic_code).length)).to_i.to_s + "%" %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+

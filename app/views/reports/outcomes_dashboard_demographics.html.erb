@@ -1,0 +1,413 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    //$(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+<h1>Range selection</h1>
+<div class="field">
+  <%= form_tag(outcomes_dashboard_demographics_path(provider_id: params[:provider_id], curriculum_initials: params[:curriculum_initials]), method: :get) do %>
+    <%= text_field_tag :start, params[:start], required: true, class: "datepicker" %>
+    <%= text_field_tag :stop, params[:stop], required: true, class: "datepicker" %>
+    <%= submit_tag ("Go") %>
+  <% end %>
+</div>
+
+<h1>Outcomes Dashboard</h1>
+<p>This dashboard includes data from cohorts based on your individual filters and a time range of <%= @window_start %> to <%= @window_stop %>. If a cohort delivered instruction during that window, then it and all of its recorded surveys form part of this report.</p>
+
+
+<h1>Demographics</h1>
+  <table class="apa">
+    <caption>Demographics (Source: Cohort Closure; Totals may differ from Survey-Sourced Data)</caption>
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Initiates</th>
+        <th colspan="2">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Gender</div></div>
+          <div class="row">
+            <div class="col">Female</div>
+            <div class="col">Male</div>
+          </div>
+        </th>
+        <th colspan="3">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Age</div></div>
+          <div class="row">
+            <div class="col">10-13</div>
+            <div class="col">14-19</div>
+            <div class="col">20+</div>
+          </div>
+        </th>
+        <th colspan="4">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Target Populations</div></div>
+          <div class="row">
+            <div class="col">Foster</div>
+            <div class="col">Pregnant/<br />Parenting</div>
+            <div class="col">DJJ<br /> Involved</div>
+            <div class="col">LGBTQIA+</div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @poolNames.each do |pool| %>
+        <% if @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).length > 1 %>
+          <tr>
+            <td><%= pool[0] + " " + pool[1].to_s %></td>
+            <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+            <%# PROVIDER-LEVEL FOR POOLED %>
+            <%# Gender %>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_female}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_male}.sum %></td>
+            <%# Age %>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_10_13}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_14_19}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_20}.sum %></td>
+            <%# Targets %>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_foster}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_preg_par}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_juv_jus}.sum %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_lgbt}.sum %></td>
+          </tr>
+          <% @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).each do |provider| %>
+            <%# PROVIDERS WITHIN A POOL %>
+            <tr>
+              <td><%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? " └ " : " ├ ") + provider.long_name %></td>
+              <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+              <%# Gender %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_female}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_male}.sum %></td>
+              <%# Age %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_10_13}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_14_19}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_20}.sum %></td>
+              <%# Targets %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_foster}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_preg_par}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_juv_jus}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: provider.id).uniq.map{|i| i.coho_down.ppr_count_lgbt}.sum %></td>
+            </tr>
+                <% @included_cohorts.where(provider_id: provider.id).each do |cohort| %>
+                <%# COHORTS WITHIN POOLED PROVIDERS %>
+                  <tr>
+                    <td><%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? "  " : " │") + (cohort == (@included_cohorts.where(provider_id: provider.id).last) ? "   └ " : "   ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%></td>
+                    <% if cohort.coho_down.nil? %>
+                      <td>—</td>
+                      <%# Gender %>
+                        <td>—</td>
+                        <td>—</td>
+                      <%# Age %>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                      <%# Targets %>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>—</td>
+                    <% else %>
+                      <td><%= cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs %></td>
+                      <%# Gender %>
+                        <td><%= cohort.coho_down.ppr_count_female %></td>
+                        <td><%= cohort.coho_down.ppr_count_male %></td>
+                      <%# Age %>
+                        <td><%= cohort.coho_down.ppr_count_10_13 %></td>
+                        <td><%= cohort.coho_down.ppr_count_14_19 %></td>
+                        <td><%= cohort.coho_down.ppr_count_20 %></td>
+                      <%# Targets %>
+                        <td><%= cohort.coho_down.ppr_count_foster %></td>
+                        <td><%= cohort.coho_down.ppr_count_preg_par %></td>
+                        <td><%= cohort.coho_down.ppr_count_juv_jus %></td>
+                        <td><%= cohort.coho_down.ppr_count_lgbt %></td>
+                    <% end %>
+                  </tr>
+                <% end %>
+          <% end %>
+        <% else %>
+          <tr>
+            <%# NON-POOLED PROVIDER %>
+            <td><%= pool[0] + " " + pool[1].to_s %></td>
+            <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.total_initiated_ms + i.coho_down.total_initiated_hs}.sum %></td>
+            <%# Gender %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_female}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_male}.sum %></td>
+              <%# Age %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_10_13}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_14_19}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_20}.sum %></td>
+              <%# Targets %>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_foster}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_preg_par}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_juv_jus}.sum %></td>
+                <td><%= @included_cohorts.joins(:coho_down).where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.coho_down.ppr_count_lgbt}.sum %></td>
+          </tr>
+          <% @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).each do |cohort| %>
+            <%# COHORTS WITHIN NON-POOLED PROVIDERS %>
+            <tr>
+              <td><%= (cohort == (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id))).last ? " └ " : " ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%></td>
+              <% if cohort.coho_down.nil? %>
+                <td>—</td>
+                <%# Gender %>
+                  <td>—</td>
+                  <td>—</td>
+                <%# Age %>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                <%# Targets %>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+              <% else %>
+                <td><%= cohort.coho_down.total_initiated_ms + cohort.coho_down.total_initiated_hs %></td>
+                <%# Gender %>
+                  <td><%= cohort.coho_down.ppr_count_female %></td>
+                  <td><%= cohort.coho_down.ppr_count_male %></td>
+                <%# Age %>
+                  <td><%= cohort.coho_down.ppr_count_10_13 %></td>
+                  <td><%= cohort.coho_down.ppr_count_14_19 %></td>
+                  <td><%= cohort.coho_down.ppr_count_20 %></td>
+                <%# Targets %>
+                  <td><%= cohort.coho_down.ppr_count_foster %></td>
+                  <td><%= cohort.coho_down.ppr_count_preg_par %></td>
+                  <td><%= cohort.coho_down.ppr_count_juv_jus %></td>
+                  <td><%= cohort.coho_down.ppr_count_lgbt %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+
+
+
+<h1>Demographics</h1>
+  <table class="apa">
+    <caption>Demographics (Source: Survey Data; Totals may differ from Cohort Closure Data)</caption>
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Entry Surveys</th>
+        <th colspan="3">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Gender</div></div>
+          <div class="row">
+            <div class="col">Female</div>
+            <div class="col">Male</div>
+            <div class="col">Unspecified</div>
+          </div>
+        </th>
+        <th colspan="4">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Age</div></div>
+          <div class="row">
+            <div class="col">10-13</div>
+            <div class="col">14-18</div>
+            <div class="col">18+</div>
+            <div class="col">Unspecified</div>
+          </div>
+        </th>
+        <th colspan="7">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Race</div></div>
+          <div class="row">
+            <div class="col">AI/AN</div>
+            <div class="col">A</div>
+            <div class="col">B/AA</div>
+            <div class="col">NH/OPI</div>
+            <div class="col">W/C</div>
+            <div class="col">Other</div>
+            <div class="col">Unspecified</div>
+          </div>
+        </th>
+        <th colspan="3">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Ethnicity</div></div>
+          <div class="row">
+            <div class="col">Hispanic</div>
+            <div class="col">Non-Hispanic</div>
+            <div class="col">Unspecified</div>
+          </div>
+        </th> 
+        <th colspan="4">
+          <div class="row" style="border-bottom: 1px solid black; margin: auto"><div style="margin: auto">Target Populations</div></div>
+          <div class="row">
+            <div class="col">Foster</div>
+            <div class="col">Pregnant/<br />Parenting</div>
+            <div class="col">DJJ<br /> Involved</div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @poolNames.each do |pool| %>
+        <% if @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).length > 1 %>
+          <tr>
+            <td><%= pool[0] + " " + pool[1].to_s %></td>
+            <td><%= @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).uniq.map{|i| i.entry_survey_ids.length}.sum %></td>
+            <%# PROVIDER-LEVEL FOR POOLED %>
+            <%# Gender %>
+              <td><%= @included_entry.where(is_male: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_male: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_male: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Age %>
+              <td><%= @included_entry.where(m_age: [1,2,3,4], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [1,2,3,4], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(m_age: [5,6,7], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [5,6,7,8], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(h_age: [9,10,11,12], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(m_age: nil, h_age: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Race %>
+              <td><%= @included_entry.where(race_indian: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_asian: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_black: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_pacific: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_white: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_other: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_indian: false, race_asian: false, race_black: false, race_pacific: false, race_white: false, race_other: false, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Ethnicity %>
+              <td><%= @included_entry.where(is_hispanic: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_hispanic: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_hispanic: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Targets %>
+              <td><%= @included_entry.where(lives_foster_family: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_entry.where(lives_foster_group: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+              <td><%= @included_entry.where(preg: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+              <td><%= @included_entry.where(lives_jail: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+          </tr>
+          <% @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).each do |provider| %>
+            <%# PROVIDERS WITHIN A POOL %>
+            <tr>
+              <td><%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? " └ " : " ├ ") + provider.long_name %></td>
+              <td><%= @included_entry.where(id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <%# Gender %>
+                <td><%= @included_entry.where(is_male: 2, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(is_male: 1, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(is_male: nil, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <%# Age %>
+                <td><%= @included_entry.where(m_age: [1,2,3,4], id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [1,2,3,4], id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(m_age: [5,6,7], id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [5,6,7,8], id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(h_age: [9,10,11,12], id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(m_age: nil, h_age: nil, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <%# Race %>
+                <td><%= @included_entry.where(race_indian: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_asian: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_black: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_pacific: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_white: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_other: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(race_indian: false, race_asian: false, race_black: false, race_pacific: false, race_white: false, race_other: false, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <%# Ethnicity %>
+                <td><%= @included_entry.where(is_hispanic: 1, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(is_hispanic: 2, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+                <td><%= @included_entry.where(is_hispanic: nil, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <%# Targets %>
+                <td><%= @included_entry.where(lives_foster_family: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_entry.where(lives_foster_group: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+                <td><%= @included_entry.where(preg: 2, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+                <td><%= @included_entry.where(lives_jail: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+            </tr>
+                <% @included_cohorts.where(provider_id: provider.id).each do |cohort| %>
+                <%# COHORTS WITHIN POOLED PROVIDERS %>
+                  <tr>
+                    <td>
+                      <%= (provider == @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).last ? "  " : " │") + (cohort == (@included_cohorts.where(provider_id: provider.id).last) ? "   └ " : "   ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+                    </td>
+                    <td><%= cohort.entry_surveys.length %></td>
+                    <%# Gender %>
+                      <td><%= @included_entry.where(is_male: 2, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_male: 1, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_male: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Age %>
+                      <td><%= @included_entry.where(m_age: [1,2,3,4], id: cohort.entry_surveys.pluck(:id)).uniq.length + @included_entry.where(h_age: [1,2,3,4], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(m_age: [5,6,7], id: cohort.entry_surveys.pluck(:id)).uniq.length + @included_entry.where(h_age: [5,6,7,8], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(h_age: [9,10,11,12], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(m_age: nil, h_age: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Race %>
+                      <td><%= @included_entry.where(race_indian: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_asian: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_black: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_pacific: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_white: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_other: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_indian: false, race_asian: false, race_black: false, race_pacific: false, race_white: false, race_other: false, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Ethnicity %>
+                      <td><%= @included_entry.where(is_hispanic: 1, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_hispanic: 2, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_hispanic: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Targets %>
+                      <td><%= @included_entry.where(lives_foster_family: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_entry.where(lives_foster_group: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+                      <td><%= @included_entry.where(preg: 2, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+                      <td><%= @included_entry.where(lives_jail: true, id: @included_cohorts.where(provider_id: provider.id).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+                  </tr>
+                <% end %>
+          <% end %>
+        <% else %>
+          <tr>
+            <td><%= pool[0] + " " + pool[1].to_s %></td>
+            <td><%= @included_entry.where(id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# PROVIDER-LEVEL FOR NON-POOLED %>
+            <%# Gender %>
+              <td><%= @included_entry.where(is_male: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_male: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_male: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Age %>
+              <td><%= @included_entry.where(m_age: [1,2,3,4], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [1,2,3,4], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(m_age: [5,6,7], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length + @included_entry.where(h_age: [5,6,7,8], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(h_age: [9,10,11,12], id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(m_age: nil, h_age: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Race %>
+              <td><%= @included_entry.where(race_indian: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_asian: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_black: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_pacific: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_white: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_other: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(race_indian: false, race_asian: false, race_black: false, race_pacific: false, race_white: false, race_other: false, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Ethnicity %>
+              <td><%= @included_entry.where(is_hispanic: 1, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_hispanic: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+              <td><%= @included_entry.where(is_hispanic: nil, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).length %></td>
+            <%# Targets %>
+              <td><%= @included_entry.where(lives_foster_family: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_entry.where(lives_foster_group: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+              <td><%= @included_entry.where(preg: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+              <td><%= @included_entry.where(lives_jail: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+          </tr>
+          <% @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).each do |cohort| %>
+            <%# COHORTS WITHIN NON-POOLED PROVIDERS %>
+            <tr>
+              <td>
+                <%= (cohort == (@included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id))).last ? " └ " : " ├ ") + cohort.name + (cohort.extra_name.length > 0 ? (" (" + cohort.extra_name + ")") : "")%>
+              </td>
+              <td><%= cohort.entry_surveys.length %></td>
+              <%# NON-POOLED COHORTS %>
+              <%# Gender %>
+                      <td><%= @included_entry.where(is_male: 2, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_male: 1, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_male: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Age %>
+                      <td><%= @included_entry.where(m_age: [1,2,3,4], id: cohort.entry_surveys.pluck(:id)).uniq.length + @included_entry.where(h_age: [1,2,3,4], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(m_age: [5,6,7], id: cohort.entry_surveys.pluck(:id)).uniq.length + @included_entry.where(h_age: [5,6,7,8], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(h_age: [9,10,11,12], id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(m_age: nil, h_age: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Race %>
+                      <td><%= @included_entry.where(race_indian: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_asian: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_black: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_pacific: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_white: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_other: true, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(race_indian: false, race_asian: false, race_black: false, race_pacific: false, race_white: false, race_other: false, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Ethnicity %>
+                      <td><%= @included_entry.where(is_hispanic: 1, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_hispanic: 2, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                      <td><%= @included_entry.where(is_hispanic: nil, id: cohort.entry_surveys.pluck(:id)).uniq.length %></td>
+                    <%# Targets %>
+                      <td><%= @included_entry.where(lives_foster_family: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).or(@included_entry.where(lives_foster_group: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq)).uniq.length %></td>
+                      <td><%= @included_entry.where(preg: 2, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+                      <td><%= @included_entry.where(lives_jail: true, id: @included_cohorts.where(provider_id: @included_providers.where(pmms_aggregate_name: pool[0], period: pool[1]).pluck(:id)).map{|i| i.entry_surveys.pluck(:id)}.flatten.sort.uniq).uniq.length %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>

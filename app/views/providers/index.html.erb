@@ -1,0 +1,46 @@
+<p id="notice"><%= notice %></p>
+<p>Below will be listed providers that you have access to for the current reporting period. By the end of the reporting period, their fact sheets should be complete.</p>
+
+<h1>Providers</h1>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Period</th>
+      <th>Name</th>
+      <th>Test</th>
+      <th>Pool</th>
+      <th>Done</th>
+      <th colspan="4"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @providers.each do |provider| %>
+      <tr>
+        <td><%= provider.period %></td>
+        <td><%= provider.long_name %></td>
+        <td><%= provider.is_test ? "✓" : "✗" %></td>
+        <td><%= provider.can_pool ? provider.pmms_aggregate_name : "—" %></td>
+        <td><%= provider.done ? "✓" : "✗" %></td>
+        <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) %>
+          <td><%= link_to 'Survey Data', provider_surveys_path(provider) %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+
+        <td><%= link_to 'Show', provider %></td>
+        <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
+        <% if current_user.has_role?(:technician) %>
+          <td><%= link_to 'Destroy', provider, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Provider', new_provider_path %>

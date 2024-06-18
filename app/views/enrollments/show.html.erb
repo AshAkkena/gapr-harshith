@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Cohort:</strong>
+  <%= @enrollment.cohort %>
+</p>
+
+<p>
+  <strong>Name first:</strong>
+  <%= @enrollment.name_first %>
+</p>
+
+<p>
+  <strong>Name pref:</strong>
+  <%= @enrollment.name_pref %>
+</p>
+
+<p>
+  <strong>Name last:</strong>
+  <%= @enrollment.name_last %>
+</p>
+
+<p>
+  <strong>Needs perm:</strong>
+  <%= @enrollment.needs_perm %>
+</p>
+
+<p>
+  <strong>Perm prog:</strong>
+  <%= @enrollment.perm_prog %>
+</p>
+
+<p>
+  <strong>Perm surveys:</strong>
+  <%= @enrollment.perm_surveys %>
+</p>
+
+<p>
+  <strong>Trashed:</strong>
+  <%= @enrollment.trashed %>
+</p>
+
+<%= link_to 'Edit', edit_enrollment_path(@enrollment) %> |
+<%= link_to 'Back', enrollments_path %>

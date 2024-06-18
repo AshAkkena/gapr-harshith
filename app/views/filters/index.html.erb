@@ -1,0 +1,45 @@
+<h1>Filters</h1>
+<p>These are all the providers you <i>could</i> see. <i>Hidden</i> providers are hidden for you from <i>all</i> aspects of the site.</p>
+<table class="apa">
+  <tr>
+    <th>Period</th>
+    <th colspan="2">Provider</th>
+    <th>Visibility</th>
+  </tr>
+<% @providers.each do |provider| %>
+  <tr>
+    <td><%= provider.period.to_s %></td>
+    <% if provider.can_pool %>
+      <td><%= provider.pmms_aggregate_name %></td><td><%= provider.long_name %></td>
+    <% else %>
+      <td colspan="2"><%= provider.long_name %></td>
+    <% end %>
+    <td>
+      <% if @filters.where(user_id: current_user.id, provider_id: provider.id).length > 0 %>
+        ✖ <%= link_to '🔁', remove_filter_path(@filters.where(provider_id: provider.id).first.id), method: :delete %>
+      <% else %>
+        ✔ <%= link_to '🔁', add_filter_path(provider.id), method: :post %>
+      <% end %>
+    </td>
+  </tr>
+<% end %>
+</table>
+<br />
+<% if @current_user.has_role?(:technician) %>
+  <h1>Technician View</h1>
+  <table class="apa">
+    <tr>
+      <th>User</th>
+      <th>Provider</th>
+      <th></th>
+    </tr>
+    <% @filters.each do |f| %>
+      <tr>
+        <td><%= f.user.email %></td>
+        <td><%= f.provider.period %> <%= f.provider.long_name %></td>
+        <td><%= link_to 'Remove', remove_filter_path(f.id), method: :delete %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+<br />

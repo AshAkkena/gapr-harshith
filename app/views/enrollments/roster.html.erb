@@ -1,0 +1,90 @@
+<p id="notice"><%= notice %></p>
+<p style="text-align: center">Georgia Division of Family &amp; Children Services<br />State Personal Responsibility Education Program (PREP)</p>
+<h1 style="text-align: center; text-transform: uppercase">Master Roster</h1>
+<div class="d-flex">
+  <div class="p-2">
+    <p><b>Contractor Name:</b> <%= @cohort.provider.long_name %></p>
+    <p><b>Implementation Site and Address:</b> <%= @cohort.intended_setting == "Virtual" ? "(Virtual)" : @cohort.address %>
+    <p><b>Facilitator:</b> <%= @cohort.facilitator %></p>
+  </div>
+  <div class="ms-auto p-2">
+    <p><b>Cycle:</b> <%= @cohort.extra_name.blank? ? "(Unspecified)" : @cohort.extra_name %></p>
+    <p><b>Sex Education Curricula:</b> <%= @cohort.curriculum_choice %></p>
+  </div>
+</div>
+<table class="apa" style="margin-left: auto; margin-right: auto">
+  <tr>
+    <th colspan="11" style="border-bottom: 0px"></th>
+    <th colspan="<%= @curricula_base.length %>" style="border-bottom: 0px"><div style="border-bottom: 1px solid black">FLASH</div></th>
+    <th colspan="<%= @curricula_sex.length %>" style="border-bottom: 0px"><div style="border-bottom: 1px solid black"><%= @cohort.curriculum_choice %></div></th>
+    <th style="border-bottom: 0px"></th>
+  </tr>
+  <tr style="background-color: white; border-top: 0px solid white; border-bottom: 0px">
+    <th style="border-top: 0px; border-bottom: 0px">Name</th>
+    <th style="border-top: 0px; border-bottom: 0px">Age</th>
+    <th style="border-top: 0px; border-bottom: 0px">Sex</th>
+    <th colspan="7" style="border-top: 0px; border-bottom: 0px">Race</th>
+    <th style="border-top: 0px; border-bottom: 0px">Consent</th>
+    <% @curricula_base.each do |c| %>
+      <th style="border-top: 0px; border-bottom: 0px"><%= c.delivery_sequence %></th>
+    <% end %>
+    <% @curricula_sex.each do |c| %>
+      <th style="border-top: 0px; border-bottom: 0px"><%= c.delivery_sequence %></th>
+    <% end %>
+    <th style="border-top: 0px; border-bottom: 0px">Hours</th>
+  </tr>
+  <tr>
+    <th colspan="11"></th>
+    <% @curricula_base_dates.each do |c| %>
+      <th>
+        <% c.each do |d| %>
+          <%= d.strftime("%b %-d") %><br />
+        <% end %>
+      </th>
+    <% end %>
+    <% @curricula_sex_dates.each do |c| %>
+      <th>
+        <% c.each do |d| %>
+          <%= d.strftime("%b %-d") %><br />
+        <% end %>
+      </th>
+    <% end %>
+    </th>
+    <th></th>
+  </tr>
+  <% @master_roster_table.each do |r| %>
+    <tr>
+      <td><%= r[:name] %></td>
+      <td><%= r[:age].to_s %></td>
+      <td><%= r[:sex] %></td>
+      <td><%= r[:race_as] %></td>
+      <td><%= r[:race_bl] %></td>
+      <td><%= r[:race_hs] %></td>
+      <td><%= r[:race_na] %></td>
+      <td><%= r[:race_oh] %></td>
+      <td><%= r[:race_pc] %></td>
+      <td><%= r[:race_wh] %></td>
+      <td><%= r[:consent] %></td>
+      <% r[:base_attendance].each do |a| %>
+        <td><%= a %></td>
+      <% end %>
+      <% r[:sex_attendance].each do |a| %>
+        <td><%= a %></td>
+      <% end %>
+      <td><%= r[:hours].to_s %></td>
+    </tr>
+  <% end %>
+</table>
+<div class="d-flex">
+  <div class="p-2">
+    <p>Notes:<ul>
+    <li>Gender codes: F = female, M = male</li>
+    <li>Race codes: A = Asian, B = Black/African-American, H = Hispanic, N = Native American, O = Other, P = Pacific Islander/Native Hawaiian, W = White/Caucasian</li>
+    <li>Attendance codes: ✓ = present, ✗ = absent</li>
+    </ul></p>
+  </div>
+  <div class="ms-auto p-2">
+    <p><b>Total # of Participant Dropouts:</b> WIP</p>
+    <p><b>Reasons for Drpoout:</b> WIP</p>
+  </div>
+</div>

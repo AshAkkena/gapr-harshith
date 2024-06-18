@@ -1,0 +1,37 @@
+<%= form_with(model: module_lookup) do |form| %>
+  <% if module_lookup.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(module_lookup.errors.count, "error") %> prohibited this module_lookup from being saved:</h2>
+
+      <ul>
+        <% module_lookup.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :period %>
+    <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abbreviated_curriculum %>
+    <%= form.text_field :abbreviated_curriculum %>
+  </div>
+
+  <div class="field">
+    <%= form.label :delivery_sequence %>
+    <%= form.number_field :delivery_sequence %>
+  </div>
+
+  <div class="field">
+    <%= form.label :basic_name %>
+    <%= form.text_field :basic_name %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,63 @@
+<% content_for :header do %>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.load('current', {'packages':['line']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Day', 'Total'],
+        <% @date_counts.each do |dc| %>
+        [ new Date(<%= dc[0].year %>, <%= dc[0].month - 1 %>, <%= dc[0].day %>), 
+          <%= dc[1] %>
+        ]<%= dc != @date_counts.last ? "," : "" %>
+        <% end %>
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Statewide Participation',
+            subtitle: 'Daily session log totals across all cohorts',
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+        
+        
+        
+              var data = new google.visualization.DataTable();
+      data.addColumn('date', 'Day');
+      data.addColumn('number', 'Initiates');
+
+
+      data.addRows([
+        <% @date_totals.each do |dc| %>
+        [ new Date(<%= dc[0].year %>, <%= dc[0].month - 1 %>, <%= dc[0].day %>), 
+          <%= dc[1] %>
+        ]<%= dc != @date_totals.last ? "," : "" %>
+        <% end %>
+
+      ]);
+
+      var options = {
+        chart: {
+          title: 'Cumulative Participants',
+          subtitle: 'Based on Statewide Statewide Session Log Initiate Counts'
+        },
+        width: 900,
+        height: 500
+      };
+
+      var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+      chart.draw(data, google.charts.Line.convertOptions(options));
+      }
+  </script>
+<% end %>
+<h1>Statewide Reach</h1>
+<div id="columnchart_material"></div>
+<h1>Statewide Recruitment</h1>
+<div id="linechart_material"></div>

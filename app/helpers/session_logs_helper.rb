@@ -1,0 +1,2 @@
+module SessionLogsHelper
+end

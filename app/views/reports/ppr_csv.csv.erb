@@ -1,0 +1,4 @@
+<%= CSV.generate_line(['provider', 'site', 'unclosed','initiated','graduated','male','female','age10','age14','age20','pregnant','justice','foster','runaway','lgbt']) -%>
+<% @ppr_data.each do |i| -%>
+<%= CSV.generate_line([i[:n_provider].gsub("'","").gsub("&","and"), i[:n_site].gsub("'","").gsub("&","and"), i[:n_unclosed], i[:n_initiated], i[:n_graduated], i[:n_male], i[:n_female], i[:n_10], i[:n_14], i[:n_20], i[:n_preg], i[:n_justice], i[:n_foster], i[:n_runaway], i[:n_lgbt]]) -%>
+<% end -%>

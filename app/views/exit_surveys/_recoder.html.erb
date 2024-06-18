@@ -1,0 +1,37 @@
+<%= form_with(model: exit_survey) do |form| %>
+  <% if exit_survey.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(exit_survey.errors.count, "error") %> prohibited this exit_survey from being saved:</h2>
+
+      <ul>
+        <% exit_survey.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :lang_other %>
+    <%= form.check_box :lang_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_other_txt %>
+    <%= form.text_field :lang_other_txt %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_other %>
+    <%= form.check_box :race_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_other_txt %>
+    <%= form.text_field :race_other_txt %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

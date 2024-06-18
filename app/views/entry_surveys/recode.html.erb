@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Entry Surveys</h1>
+
+<table class="apa">
+  <thead>
+    <tr>
+      <th>Magic</th>
+      <th>Race</th>
+      <th>TXT</th>
+      <th>Lang</th>
+      <th>TXT</th>
+      <th>Resp</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @entry_surveys.each do |entry_survey| %>
+      <tr>
+        <td><%= entry_survey.magic %><%= entry_survey.coho_up.nil? ? "✗" : "✔" %></td>
+        <td><%= entry_survey[:race_other] ? link_to("✔", recode_entry_survey_path(entry_survey)) : "✗" %></td>
+        <td><%= entry_survey[:race_other_txt] %></td>
+        <td><%= entry_survey[:lang_other] ? link_to("✔", recode_entry_survey_path(entry_survey)) : "✗" %></td>
+        <td><%= entry_survey[:lang_other_txt] %></td>
+        <td><%= entry_survey[:response_id] %></td>
+        <td><%= entry_survey[:happened_on] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>

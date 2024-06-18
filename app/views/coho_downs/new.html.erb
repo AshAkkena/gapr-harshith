@@ -1,0 +1,16 @@
+<h1>Close a Cohort</h1>
+
+<h2>Review</h2>
+<p>Before continuing with closure, please review the cohort information below:</p>
+<div class="container border border-info">
+  <%= render 'cohorts/snapshot', cohort: @my_cohort %>
+</div>
+<p>If needed, please <%= link_to 'update', edit_cohort_path(@my_cohort[:id]) %> the cohort information prior to closure.</p>
+
+<h2>Documentation</h2>
+<p>Please provide some information about this cohort.</p>
+<%= render 'form', coho_down: @coho_down %>
+
+
+
+<%= link_to 'Back', coho_downs_path %>

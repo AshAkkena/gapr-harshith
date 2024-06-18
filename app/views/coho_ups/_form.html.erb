@@ -1,0 +1,76 @@
+<%= form_with(model: coho_up) do |form| %>
+  <% if coho_up.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(coho_up.errors.count, "error") %> prohibited this activation from being saved:</h2>
+
+      <ul>
+        <% coho_up.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.text_field :cohort_id, readonly: true, hidden: true %>
+  </div>
+  
+  <h2>Cohort Reach</h2>
+  <p>Based on the current status of the cohort, please specify how many participants fall under the following demographics:<p>
+  
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <div class="field">
+        <b><%= form.label :ppr_count_total %></b>
+        <%= form.number_field :ppr_count_total, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_male %>
+        <%= form.number_field :ppr_count_male, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_female %>
+        <%= form.number_field :ppr_count_female, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_10_13 %>
+        <%= form.number_field :ppr_count_10_13, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_14_19 %>
+        <%= form.number_field :ppr_count_14_19, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_20 %>
+        <%= form.number_field :ppr_count_20, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_preg_par %>
+        <%= form.number_field :ppr_count_preg_par, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_juv_jus %>
+        <%= form.number_field :ppr_count_juv_jus, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_foster %>
+        <%= form.number_field :ppr_count_foster, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_runaway %>
+        <%= form.number_field :ppr_count_runaway, required: true, min: 0 %>
+      </div>
+      <div class="field">
+        <%= form.label :ppr_count_lgbt %>
+        <%= form.number_field :ppr_count_lgbt, required: true, min: 0 %>
+      </div>
+    </div>
+  </div>
+  <p>Don't worry if these numbers change; you will be able to enter the final counts when closing the cohort.</p>
+  
+  <h2>Confirm and Submit</h2>
+  <p>Please be certain that you want to activate this cohort and add it to the PREP story. You can edit it later, but you will not be able to remove it.</p>
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

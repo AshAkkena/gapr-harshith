@@ -1,0 +1,10 @@
+<h1>Cohort Activation</h1>
+
+<p>Before continuing with activation, please review the cohort information below:</p>
+<div class="container border border-info">
+  <%= render 'cohorts/snapshot', cohort: @my_cohort %>
+</div>
+<p>If needed, please <%= link_to 'update', edit_cohort_path(@my_cohort[:id]) %> the cohort information prior to activation.</p>
+<%= render 'form', coho_up: @coho_up %>
+
+<%= link_to 'Back to Cohorts', cohorts_path %>

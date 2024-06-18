@@ -1,0 +1,353 @@
+<% content_for :header do %>
+  <script>
+    var ready = function() {
+          $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+    //$(document).on('turbolinks:load', ready); 
+  </script>
+<% end %>
+
+<%= form_with(model: cohort) do |form| %>
+  <% if cohort.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(cohort.errors.count, "error") %> prohibited this cohort from being saved:</h2>
+
+      <ul>
+        <% cohort.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <h2>Basics</h2>
+  <p>Fill out the following information to the <i>best</i> of your knowledge. Don't worry if this doesn't look like everything: later on, we'll ask for some additional information alongside confirmation of a few things.</p>
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <div class="field">
+        <%= form.label :period %>
+        <%= form.number_field :period, readonly: true, step: 0.1, value: Prep::Constants::Year %>
+      </div>
+
+      <div class="field">
+        <%= form.label :provider_id %>
+        <%= form.select(:provider_id, @providers.collect { |v| [ v.period.to_s + ': ' + v.long_name, v.id ] }, {}, { "data-placeholder": "Select Provider" }) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :name %>
+        <%= form.text_field :name, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :extra_name %>
+        <%= form.text_field :extra_name %>
+      </div>
+
+      <div class="field">
+        <%= form.label :address %>
+        <%= form.text_field :address, {size: 25, maxlength: 255} %>
+      </div>
+
+      <div class="field">
+        <%= form.label :facilitator %>
+        <%= form.text_field :facilitator, {size: 25, maxlength: 255} %>
+      </div>
+
+
+      <div class="field">
+        <%= form.label :curriculum_choice %>
+        <%= form.select(:curriculum_choice, ['MPC', 'MAD', 'BPBRBP', 'LN' ], {}, {prompt: 'Select one', required: true}) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :intended_start %>
+        <%= form.text_field :intended_start, required: true, class: "datepicker" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :intended_finish %>
+        <%= form.text_field :intended_finish, required: true, class: "datepicker" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :intended_session_count %>
+        <%= form.number_field :intended_session_count, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :intended_session_duration_minute %>
+        <%= form.number_field :intended_session_duration_minute, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :intended_setting %>
+        <%= form.select :intended_setting, ['In School, during school', 'In School, after school', 'Community-Based Organization', 'Clinic', 'Foster Care Setting', 'Juvenile Detention Setting', 'Residential Mental Health Treatment Facility', 'Virtual', 'Other'], prompt: 'Select one', required: true %>
+      </div>
+      
+      <div class="field">
+        <%= form.label :intended_participants_ms %>
+        <%= form.number_field :intended_participants_ms, required:true %>
+      </div>
+      
+      <div class="field">
+        <%= form.label :intended_participants_hs %>
+        <%= form.number_field :intended_participants_hs, required:true %>
+      </div>
+      
+        <% if current_user.has_role?(:technician) %>
+          <div class="field">
+            <%= form.check_box :uses_enrollment %>
+            <%= form.label :uses_enrollment %>
+          </div>
+        <% end %>
+    </div>
+  </div>
+  
+  <hr />
+  <h2>Target Demographics</h2>
+  <p>For the following fields, note if this cohort is explicitly targetting the described population. You do not <i>have to</i> select any of these; select boxes only if your cohort is specifically designed to appeal to any of the following categories of participant:</p>
+  <div class="d-flex justify-content-around">
+    <div>  
+      <div class="field">
+        <%= form.check_box :target_foster %>
+        <%= form.label :target_foster %>
+      </div>
+      
+      <div class="field">
+        <%= form.check_box :target_adjudicated %>
+        <%= form.label :target_adjudicated %>
+      </div>
+      
+      <div class="field">
+        <%= form.check_box :target_homeless_runaway %>
+        <%= form.label :target_homeless_runaway %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_hiv_aids %>
+        <%= form.label :target_hiv_aids %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_pregnant_parenting %>
+        <%= form.label :target_pregnant_parenting %>
+      </div>
+    </div>
+    <div>
+      <div class="field">
+        <%= form.check_box :target_latino %>
+        <%= form.label :target_latino %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_african_american %>
+        <%= form.label :target_african_american %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_native_american %>
+        <%= form.label :target_native_american %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_male %>
+        <%= form.label :target_male %>
+      </div>
+    </div>
+    <div>
+      <div class="field">
+        <%= form.check_box :target_highneed_geo %>
+        <%= form.label :target_highneed_geo %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_dropout %>
+        <%= form.label :target_dropout %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_mental_health %>
+        <%= form.label :target_mental_health %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :target_trafficked %>
+        <%= form.label :target_trafficked %>
+      </div>
+    </div>
+  </div>
+  <hr />
+  
+  <h2>Curricular Properties</h2>
+  <p>Based on the selected curricula, please consider the following domains and mark whether or not each statement is true for this cohort's intended instruction.</p>
+  <div class="d-flex justify-content-around">  
+    <div class="curriculum-props">
+      <h3>Healthy Relationships</h3> 
+      <div class="field">
+        <%= form.check_box :covered_healthy_relationship %>
+        <%= form.label :covered_healthy_relationship %>
+      </div>
+
+      <div class="field">
+        <%= form.check_box :healthy_relationship_material_evidence_based %>
+        <%= form.label :healthy_relationship_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_relationship_material_add_curr_entirely %>
+        <%= form.label :healthy_relationship_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_relationship_material_add_curr_adhoc %>
+        <%= form.label :healthy_relationship_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_relationship_material_original_content %>
+        <%= form.label :healthy_relationship_material_original_content %>
+      </div>
+    </div>
+    <div class="curriculum-props">
+      <h3>Adolescent Development</h3>
+      <div class="field">
+        <%= form.check_box :covered_adolescent_development %>
+        <%= form.label :covered_adolescent_development %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :adolescent_development_material_evidence_based %>
+        <%= form.label :adolescent_development_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :adolescent_development_material_add_curr_entirely %>
+        <%= form.label :adolescent_development_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :adolescent_development_material_add_curr_adhoc %>
+        <%= form.label :adolescent_development_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :adolescent_development_material_original_content %>
+        <%= form.label :adolescent_development_material_original_content %>
+      </div>
+    </div>
+    <div class="curriculum-props">
+      <h3>Financial Literacy</h3>
+      <div class="field">
+        <%= form.check_box :covered_financial_literacy %>
+        <%= form.label :covered_financial_literacy %>
+      </div>
+      <div class="field">
+        <%= form.check_box :financial_literacy_material_evidence_based %>
+        <%= form.label :financial_literacy_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :financial_literacy_material_add_curr_entirely %>
+        <%= form.label :financial_literacy_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :financial_literacy_material_add_curr_adhoc %>
+        <%= form.label :financial_literacy_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :financial_literacy_material_original_content %>
+        <%= form.label :financial_literacy_material_original_content %>
+      </div>
+    </div>
+  </div>
+  <p></p>
+  <div class="d-flex justify-content-around">  
+    <div class="curriculum-props">
+      <h3>Parent-Child Communication</h3>
+      <div class="field">
+        <%= form.check_box :covered_par_child_comm %>
+        <%= form.label :covered_par_child_comm %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :par_child_comm_material_evidence_based %>
+        <%= form.label :par_child_comm_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :par_child_comm_material_add_curr_entirely %>
+        <%= form.label :par_child_comm_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :par_child_comm_material_add_curr_adhoc %>
+        <%= form.label :par_child_comm_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :par_child_comm_material_original_content %>
+        <%= form.label :par_child_comm_material_original_content %>
+      </div>
+    </div>
+    <div class="curriculum-props">
+      <h3>Career Success</h3>
+      <div class="field">
+        <%= form.check_box :covered_edu_career_success %>
+        <%= form.label :covered_edu_career_success %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :edu_career_success_material_evidence_based %>
+        <%= form.label :edu_career_success_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :edu_career_success_material_add_curr_entirely %>
+        <%= form.label :edu_career_success_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :edu_career_success_material_add_curr_adhoc %>
+        <%= form.label :edu_career_success_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :edu_career_success_material_original_content %>
+        <%= form.label :edu_career_success_material_original_content %>
+      </div>
+    </div>
+    <div class="curriculum-props">
+      <h3>Healthy Life Skills</h3>
+      <div class="field">
+        <%= form.check_box :covered_healthy_life_skills %>
+        <%= form.label :covered_healthy_life_skills %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_life_skills_material_evidence_based %>
+        <%= form.label :healthy_life_skills_material_evidence_based %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_life_skills_material_add_curr_entirely %>
+        <%= form.label :healthy_life_skills_material_add_curr_entirely %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_life_skills_material_add_curr_adhoc %>
+        <%= form.label :healthy_life_skills_material_add_curr_adhoc %>
+      </div>
+    
+      <div class="field">
+        <%= form.check_box :healthy_life_skills_material_original_content %>
+        <%= form.label :healthy_life_skills_material_original_content %>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

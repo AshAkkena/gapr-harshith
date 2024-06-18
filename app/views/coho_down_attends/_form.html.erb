@@ -1,0 +1,64 @@
+<div class="row">
+  <%= form_with(model: coho_down_attend) do |form| %>
+    <% if coho_down_attend.errors.any? %>
+      <div class="col-sm-2">
+        <div id="error_explanation">
+          <h2><%= pluralize(coho_down_attend.errors.count, "error") %> prohibited this coho_down_attend from being saved:</h2>
+
+          <ul>
+            <% coho_down_attend.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+    <div class="col-sm-2">
+      <div class="field">
+        <%= form.label :coho_down_id %>
+        <%= form.text_field :coho_down_id %>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <div class="field">
+        <%= form.label :happened_on %>
+        <%= form.date_select :happened_on %>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <div class="field">
+        <%= form.label :middleschool_headcount %>
+        <%= form.number_field :middleschool_headcount %>
+      </div>
+    </div>
+
+    <div class="col-sm-1">
+      <div class="field">
+        <%= form.label :highschool_headcount %>
+        <%= form.number_field :highschool_headcount %>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <div class="field">
+        <%= form.label :newface_ms_headcount %>
+        <%= form.number_field :newface_ms_headcount %>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <div class="field">
+        <%= form.label :newface_hs_headcount %>
+        <%= form.number_field :newface_hs_headcount %>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+      <div class="actions">
+        <%= form.submit %>
+      </div>
+    </div>
+  <% end %>
+</div>

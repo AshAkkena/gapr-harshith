@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Period:</strong>
+  <%= @module_lookup.period %>
+</p>
+
+<p>
+  <strong>Abbreviated curriculum:</strong>
+  <%= @module_lookup.abbreviated_curriculum %>
+</p>
+
+<p>
+  <strong>Delivery sequence:</strong>
+  <%= @module_lookup.delivery_sequence %>
+</p>
+
+<p>
+  <strong>Basic name:</strong>
+  <%= @module_lookup.basic_name %>
+</p>
+
+<%= link_to 'Edit', edit_module_lookup_path(@module_lookup) %> |
+<%= link_to 'Back', module_lookups_path %>

@@ -1,0 +1,98 @@
+<table class="apa">
+<caption>Participation Counts</caption>
+<tr>
+  <td>Attended at least one program session</td>
+  <td><%= @data[:dosage_one_session] %></td>
+</tr>
+<tr>
+  <td>Number of middle school age participants</td>
+  <td><%= @data[:dosage_ms_count] %></td>
+</tr>
+<tr>
+  <td>Number of high school age or older participants</td>
+  <td><%= @data[:dosage_hs_count] %></td>
+</tr>
+</table>
+
+<table class="apa">
+<caption>Program Settings</caption>
+<tr>
+  <td>Attended a session in school during school</td>
+  <td><%= @data[:dosage_during_school] %></td>
+</tr>
+<tr>
+  <td>Attended a session in school after school</td>
+  <td><%= @data[:dosage_after_school] %></td>
+</tr>
+<tr>
+  <td>Attended a session in a a community-based organization</td>
+  <td><%= @data[:dosage_community] %></td>
+</tr>
+<tr>
+  <td>Attended a session in a clinic</td>
+  <td><%= @data[:dosage_clinic] %></td>
+</tr>
+<tr>
+  <td>Attended a session in a foster care setting</td>
+  <td><%= @data[:dosage_foster_care] %></td>
+</tr>
+<tr>
+  <td>Attended a session in a juvenile detention center</td>
+  <td><%= @data[:dosage_detention] %></td>
+</tr>
+<tr>
+  <td>Attended a session in a residential mental health treatment facility</td>
+  <td><%= @data[:dosage_residential_facility] %></td>
+</tr>
+<tr>
+  <td>Attended a virtual session</td>
+  <td><%= @data[:dosage_online] %></td>
+</tr>
+<tr>
+  <td>Attended a session in another setting</td>
+  <td><%= @data[:dosage_other] %></td>
+</tr>
+</table>
+
+<table class="apa">
+<caption>Program Reach</caption>
+<tr>
+  <td>In foster care</td>
+  <td><%= @data[:reach_foster] ? "✓" : "✗" %></td>
+</tr>
+<tr>
+  <td>Homeless or runaway</td>
+  <td><%= @data[:reach_homeless] ? "✓" : "✗" %></td>
+</tr>
+<tr>
+  <td>Pregnant or parenting</td>
+  <td><%= @data[:reach_preg] ? "✓" : "✗" %></td>
+</tr>
+<tr>
+  <td>LGBTQ youth</td>
+  <td><%= @data[:reach_lgbt] ? "✓" : "✗" %></td>
+</tr>
+<tr>
+  <td>In adjudication systems</td>
+  <td><%= @data[:reach_adjudication] ? "✓" : "✗" %></td>
+</tr>
+<tr>
+  <td>None of the above</td>
+  <td><%= @data[:reach_none] ? "✓" : "✗" %></td>
+</tr>
+</table>
+
+<table class="apa">
+<caption>Count of Youth Who Completed	</caption>
+<tr>
+  <td>75% of scheduled program hours</td>
+  <td><%= @data[:dosage_75_percent] %></td>
+</tr>
+</table>
+
+<table class="apa">
+<caption>Program Hours Delivered by Cohort</caption>
+<% @data[:hours_delivered].each do |i| %>
+<tr><td><%= i %></td></tr>
+<% end %>
+</table>

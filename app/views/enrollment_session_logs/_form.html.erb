@@ -1,0 +1,27 @@
+<%= form_with(model: enrollment_session_log) do |form| %>
+  <% if enrollment_session_log.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(enrollment_session_log.errors.count, "error") %> prohibited this enrollment_session_log from being saved:</h2>
+
+      <ul>
+        <% enrollment_session_log.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :enrollment_id %>
+    <%= form.text_field :enrollment_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :session_log_id %>
+    <%= form.text_field :session_log_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

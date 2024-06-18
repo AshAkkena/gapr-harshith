@@ -1,0 +1,42 @@
+<%= form_with(model: staff_training_event) do |form| %>
+  <% if staff_training_event.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(staff_training_event.errors.count, "error") %> prohibited this staff_training_event from being saved:</h2>
+
+      <ul>
+        <% staff_training_event.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :training_name %>
+    <%= form.text_field :training_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :training_date %>
+    <%= form.date_select :training_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :training_place %>
+    <%= form.text_field :training_place %>
+  </div>
+
+  <div class="field">
+    <%= form.label :training_trainer %>
+    <%= form.text_field :training_trainer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :period %>
+    <%= form.number_field :period %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

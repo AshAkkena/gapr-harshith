@@ -1,0 +1,41 @@
+<%= form_with(model: handout) do |form| %>
+  <% if handout.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(handout.errors.count, "error") %> prohibited this handout from being saved:</h2>
+
+      <ul>
+        <% handout.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_field :description %>
+  </div>
+
+  <% if handout.document.attached? %>
+    <% if handout[:id].nil? %>
+      <p>You had selected a document, but we need you to select it again. We're working on improving this, sorry!</p>
+      <%= form.file_field :document %>
+    <% else %>
+      <p>A document is attached. <%= link_to 'Delete Receipt', delete_document_handout_path(handout.document.id), method: "delete", data: {confirm: 'You are about to delete a document. Are you sure?'} %></p>
+    <% end %>
+  <% else %>
+    <div class="field">
+      <%= form.file_field :document %>
+    </div>  
+  <% end %>
+
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

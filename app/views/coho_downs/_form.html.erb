@@ -1,0 +1,276 @@
+<% content_for :header do %>
+  <script>
+      class addFields {
+        constructor() {
+          this.links = document.querySelectorAll(".add_fields");
+          this.iterateLinks();
+        }
+
+        iterateLinks() {
+          if (this.links.length === 0) return;
+          this.links.forEach((link) => {
+            link.addEventListener("click", (e) => {
+              this.handleClick(link, e);
+            });
+          });
+        }
+
+        handleClick(link, e) {
+          if (!link || !e) return;
+          e.preventDefault();
+          let time = new Date().getTime();
+          let linkId = link.dataset.id;
+          let regexp = linkId ? new RegExp(linkId, "g") : null;
+          let newFields = regexp ? link.dataset.fields.replace(regexp, time) : null;
+          //newFields ? link.insertAdjacentHTML("beforebegin", newFields) : null;
+          if (newFields) {
+            link.insertAdjacentHTML("beforebegin", newFields);
+            $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' })
+          } else {
+            null;
+          }
+        }
+        
+      }
+      window.addEventListener("load", () => new addFields());
+      class removeFields {
+        constructor() {
+          this.iterateLinks();
+        }
+
+        iterateLinks() {
+          document.addEventListener("click", (e) => {
+            if (e.target && e.target.className == "remove_fields") {
+              this.handleClick(e.target, e);
+            }
+          });
+        }
+
+        handleClick(link, e) {
+          if (!link || !e) return;
+          e.preventDefault();
+          let fieldParent = link.closest(".nested-fields");
+          let deleteField = fieldParent
+            ? fieldParent.querySelector('input[type="hidden"]')
+            : null;
+          if (deleteField) {
+            deleteField.value = 1;
+            fieldParent.style.display = "none";
+          }
+        }
+      }
+
+      window.addEventListener("load", () => new removeFields());
+
+
+    var ready = function() {
+      $('.datepicker').datepicker( { dateFormat: 'yy-mm-dd' } );
+    };
+    $(document).ready(ready);
+  </script>
+<% end %>
+
+<%= form_with(model: coho_down, local: true) do |f| %>
+  <% if coho_down.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(coho_down.errors.count, "error") %> prohibited this coho_down from being saved:</h2>
+
+      <ul>
+        <% coho_down.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.text_field :cohort_id, readonly: true, hidden: true %>
+  </div>
+  
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <div class="field">
+        <%= f.label :total_graduated_ms %>
+        <%= f.number_field :total_graduated_ms, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :total_graduated_hs %>
+        <%= f.number_field :total_graduated_hs, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :total_initiated_ms %>
+        <%= f.number_field :total_initiated_ms, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :total_initiated_hs %>
+        <%= f.number_field :total_initiated_hs, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :total_hours_delivered %>
+        <%= f.number_field :total_hours_delivered, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :program_complete %>
+        <%= f.check_box :program_complete %>
+      </div>
+      
+      <div class="field">
+        <%= f.label :rationale %>
+        <%= f.text_field :rationale, {size: 25, maxlength: 255} %>
+      </div>
+
+      <div class="field">
+        <%= f.label :census_foster %>
+        <%= f.number_field :census_foster, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :census_homeless %>
+        <%= f.number_field :census_homeless, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :census_pregnant_parenting %>
+        <%= f.number_field :census_pregnant_parenting, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :census_adjudication %>
+        <%= f.number_field :census_adjudication, required: true, min:0, size: 2 %>
+      </div>
+
+      <div class="field">
+        <%= f.label :main_setting %>
+        <%= f.select(:main_setting, ['In School, during school', 'In School, after school', 'Community-Based Organization', 'Clinic', 'Foster Care Setting', 'Juvenile Detention Setting', 'Residential Mental Health Treatment Facility', 'Virtual', 'Other'], {},{ prompt: 'Select one', required: true }) %>
+      </div>
+
+      <div class="field">
+        <%= f.label :covid_virtualization %>
+        <%= f.check_box :covid_virtualization %>
+      </div>
+    </div>
+  </div>
+
+  <h2>Attendance</h2>
+  <fieldset>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2">
+        <p>Date</p>
+      </div>
+      <div class="col-sm-2">
+        <p><%= f.label :middleschool %></p>
+      </div>
+      <div class="col-sm-2">
+        <p><i>New</i> <%= f.label :middleschool %></p>
+      </div>
+      <div class="col-sm-2">
+        <p><%= f.label :highschool %></p>
+      </div>
+      <div class="col-sm-2">
+        <p><i>New</i> <%= f.label :highschool %></p>
+      </div>
+      <div class="col-sm-2">
+        <p>Delete Row</p>
+      </div>
+    </div>
+    <%= f.fields_for :coho_down_attends do |coho_down_attends_form| %>
+      <%= render 'coho_down_attend_fields', f: coho_down_attends_form %>
+    <% end %>
+    
+        <%= link_to_add_fields "Add Row", f, :coho_down_attends %>
+    
+  </div>
+  </fieldset>
+
+  <h2>Cohort Reach</h2>
+  <p>Based on the final status of the cohort, please specify how many participants fall under the following demographics:<p>
+  
+  <div class="d-flex flex-column align-items-start">
+    <div class="d-flex flex-column align-items-end">
+      <div class="field">
+        <b><%= f.label :ppr_count_total %></b>
+        <%= f.number_field :ppr_count_total, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_male %>
+        <%= f.number_field :ppr_count_male, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_female %>
+        <%= f.number_field :ppr_count_female, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_10_13 %>
+        <%= f.number_field :ppr_count_10_13, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_14_19 %>
+        <%= f.number_field :ppr_count_14_19, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_20 %>
+        <%= f.number_field :ppr_count_20, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_preg_par %>
+        <%= f.number_field :ppr_count_preg_par, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_juv_jus %>
+        <%= f.number_field :ppr_count_juv_jus, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_foster %>
+        <%= f.number_field :ppr_count_foster, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_runaway %>
+        <%= f.number_field :ppr_count_runaway, required: true, min: 0, size: 2  %>
+      </div>
+      <div class="field">
+        <%= f.label :ppr_count_lgbt %>
+        <%= f.number_field :ppr_count_lgbt, required: true, min: 0, size: 2  %>
+      </div>
+    </div>
+  </div>
+
+  <h2>Receipts</h2>
+  <p>Attach a file that documents this cohort's attendance. Any format of any file will do: even a picture of a gradebook on your phone, as long as it is legible!
+  <br />As a reminder, you can use the <%= link_to 'template', '/cohort-participation-template.xlsx', download: "template.xlsx" %> if your site has no established format for these data.</p>
+  <% if coho_down.receipt.attached? %>
+    <% if coho_down[:id].nil? %>
+      <p>You had selected a receipt, but we need you to select it again. We're working on improving this, sorry!</p>
+      <%= f.file_field :receipt %>
+    <% else %>
+      <p>A receipt is attached. <%= link_to 'Delete Receipt', delete_receipt_coho_down_path(coho_down.receipt.id), method: "delete", data: {confirm: 'You are about to delete a receipt. Are you sure?'} %></p>
+    <% end %>
+  <% else %>
+    <div class="field">
+      <%= f.file_field :receipt %>
+    </div>  
+  <% end %>
+
+  <% if coho_down.cohort.uses_enrollment? %>
+    <h2>Graduates</h2>
+    <p>Please note who graduated by checking the graduates:<br />(Note: we have <%= @my_cohort.session_log_ids.present? ? @my_cohort.session_log_ids.length.to_s : "0" %> sessions on file)</p>
+    <div class="field">
+      <%= f.collection_check_boxes :graduate_ids, @enrollments, :id, :quick_name do |c| %>
+        <%= c.check_box %>
+        <%= c.label + " who attended " + (c.object.session_log_ids.present? ? c.object.session_log_ids.length.to_s : "0") + " sessions" %>
+        <br />
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+  <hr />
+
+<% end %>

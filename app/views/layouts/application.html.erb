@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GaPR</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= favicon_link_tag asset_path('gapr-favicon.png') %>
+	  <%= stylesheet_link_tag '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css' %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%# = stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= content_for :header %>
+
+  </head>
+
+<body style="background-color: #AAD0FA">
+  <% if signed_in? %>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none" style="margin-bottom:20px">
+      <div class="container-fluid">
+        <%= link_to '🏠 GaPR', root_path, class: 'navbar-brand btn btn-primary', style: 'color: white' %>
+        <% if signed_in? %>
+          <ul class="navbar-nav flex-fill">
+            <li class="nav-item"><%= link_to 'Filters', filters_path, class: "nav-link" %></li>
+            <% if current_user.has_role?(:technician) %>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Back-End Controllers</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><%= link_to 'Curricula Modules List', module_lookups_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Grantee Overview', grantees_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Cohort Activations', coho_ups_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Cohort Closeouts', coho_downs_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Official Attendance', coho_down_attends_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Users', users_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Entry Surveys', entry_surveys_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Exit Surveys', exit_surveys_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Recode Entry Surveys', recode_entry_surveys_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Recode Exit Surveys', recode_exit_surveys_path, class: "dropdown-item" %></li>
+                </ul>
+              </li>
+            <% end %>
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:vicar)  %>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Reports</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><%= link_to 'Users', registration_report_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Activity', activity_report_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'At-a-Glance', visualize_cohorts_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Daily Reach', daily_reach_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Outcomes Dashboard: Activities', outcomes_dashboard_activities_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Outcomes Dashboard: Outcomes', outcomes_dashboard_outcomes_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Outcomes Dashboard: Demographics', outcomes_dashboard_demographics_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'Outcomes Dashboard: Aggregated', outcomes_dashboard_aggregated_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'PPR', ppr_path, class: "dropdown-item" %></li>
+                  <li><%= link_to 'PMMS Reports', pmms_survey_index_path, class: "dropdown-item" %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'Staff Training Events', staff_training_events_path, class: "dropdown-item" %></li>
+                </ul>
+              </li>
+            <% end %>
+
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) %>
+              <li class="nav-item"><%= link_to 'Providers', providers_path, class: "nav-link" %></li>
+            <% end %>
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, :any) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:facilitator, :any) or current_user.has_role?(:vicar) %>
+              <li class="nav-item"><%= link_to 'Cohorts', cohorts_path, class: "nav-link" %></li>
+            <% end %>
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator) %>
+              <li class="nav-item"><%= link_to 'Enrollments', enrollments_path, class: "nav-link" %></li>
+            <% end %>
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:site_admin, :any) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:vicar) %>
+              <li class="nav-item"><%= link_to 'MPR', "https://www.surveymonkey.com/r/GaPREP_FY2024_MPR", class: "nav-link" %></li>
+              <li class="nav-item"><%= link_to 'Cohort Implementation Reports', mpr_helper_path, class: "nav-link" %></li>
+            <% end %>
+            <% if current_user.has_role?(:technician) or current_user.has_role?(:vicar) or current_user.has_role?(:state_coordinator) or current_user.has_role?(:site_admin, :any) or current_user.has_role?(:facilitator, :any) %>
+              <li class="nav-item"><%= link_to 'Session Logs', session_logs_path, class: "nav-link" %></li>
+            <% end %>
+              <li class="nav-item"><%= link_to 'Resources', handouts_path, class: "nav-link" %></li>
+          </ul>
+        <% end %>
+        <ul class="navbar-nav">
+          <% if user_signed_in? %>
+          <li class="nav-item">
+            Logged in as <%= current_user.email %><br />
+            <div style="margin: auto; text-align: center">
+              <%= link_to 'Log Out', destroy_user_session_path, method: :delete, class: "btn btn-danger btn-large", style: "color: white" %>
+            </div>
+          </li>
+          <% else %>
+            <li class="nav-item"><%= link_to 'Sign In', new_user_session_path, class: "nav-link" %></li>
+            <li class="nav-item"><%= link_to 'Sign Up', new_user_registration_path, class: "nav-link" %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </nav>
+    <% end %>
+  <div class="container-fluid">    
+    <div class="container-fluid rounded" style="background-color: #FFFFFF">
+      <% flash.each do |key, value| %>
+        <div class="alert alert-<%= key %>">
+          <%= value %>
+        </div>
+      <% end %>
+      <% if user_signed_in? %>
+        <% if !(current_user.has_role?(:technician) or current_user.has_role?(:state_coordinator)) %>
+          <% if params[:controller] != "providers" and Prep::Constants::Finalize %>
+            <% if Provider.with_role(:site_admin, current_user).length == 1 %>
+              <% if !Provider.with_role(:site_admin, current_user).first["done"] %>
+                <br />
+                <div class="alert alert-info">
+                  Please finalize your provider information for the reporting period. Click <%= link_to 'here', finalize_provider_path, method: :get %> to do so.<br />
+                  Feel free to <a href="mailto:prepeval@gsu.edu">Contact GSU</a> if you have any questions or run into any problems with finalizing your provider information.
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% if params[:controller] != "cohorts" %>
+            <% if Provider.with_role(:site_admin, current_user).length == 1 %>
+              <% if policy_scope(Cohort).joins('LEFT OUTER JOIN "providers" ON "cohorts"."provider_id" = "providers"."id"').select("cohorts.*, CAST(providers.pmms_aggregate_name ~ 'AHYD' AS INT) as isAHYD, providers.long_name").order("isAHYD DESC, providers.long_name, cohorts.name, cohorts.extra_name, intended_start").where("intended_finish <= ?", 1.week.ago).joins(:coho_up).where.missing(:coho_down).length > 0 %>
+                <br />
+                <div class="alert alert-info">
+                  There may be active cohorts no longer delivering programming that you can help enter data for. Click <%= link_to 'here', cohorts_path, method: :get %> to review cohorts.<br />
+                  Feel free to <a href="mailto:prepeval@gsu.edu">Contact GSU</a> if you have any questions or run into any problems with finalizing your provider information.
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= yield %>
+    </div>
+  </div>  
+  <% if Rails.env.development? %>
+  	<% console %>
+  <% end %>
+  </body>
+</html>

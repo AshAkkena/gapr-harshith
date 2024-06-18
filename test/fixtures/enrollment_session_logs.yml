@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  enrollment: one
+  session_log: one
+
+two:
+  enrollment: two
+  session_log: two

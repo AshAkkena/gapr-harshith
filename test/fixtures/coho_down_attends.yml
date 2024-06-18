@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cohort: one
+  happened_on: 2021-09-01
+  middleschool_headcount: 1
+  highschool_headcount: 1
+  newface_ms_headcount: 1
+  newface_hs_headcount: 1
+
+two:
+  cohort: two
+  happened_on: 2021-09-01
+  middleschool_headcount: 1
+  highschool_headcount: 1
+  newface_ms_headcount: 1
+  newface_hs_headcount: 1

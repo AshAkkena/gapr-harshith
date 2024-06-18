@@ -1,0 +1,22 @@
+<div class="nested-fields row">
+  <div class="col-sm-2 field">
+    <%= f.hidden_field :_destroy %>
+    <%= f.text_field :coho_down_id, readonly: true, hidden: true %>
+    <%= f.text_field :happened_on, required: true, class: "datepicker", size: 6 %>
+  </div>
+  <div class="col-sm-2 field">
+    <%= f.number_field :middleschool_headcount, min: 0, required: true, step: 1, size: 2 %>
+  </div>
+  <div class="col-sm-2 field">
+    <%= f.number_field :newface_ms_headcount, min: 0, required: true, step: 1, size: 2 %>
+  </div>
+  <div class="col-sm-2 field">
+    <%= f.number_field :highschool_headcount, min: 0, required: true, step: 1, size: 2 %>
+  </div>
+  <div class="col-sm-2 field">
+    <%= f.number_field :newface_hs_headcount, min: 0, required: true, step: 1, size: 2 %>
+  </div>
+  <div class="col-sm-2 field">
+    <%= link_to "Remove", '', class: "remove_fields" %>
+  </div>
+</div>

@@ -1,0 +1,257 @@
+<%= form_with(model: exit_survey) do |form| %>
+  <% if exit_survey.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(exit_survey.errors.count, "error") %> prohibited this exit_survey from being saved:</h2>
+
+      <ul>
+        <% exit_survey.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :magic %>
+    <%= form.text_field :magic %>
+  </div>
+
+  <div class="field">
+    <%= form.label :contractor %>
+    <%= form.text_field :contractor %>
+  </div>
+
+  <div class="field">
+    <%= form.label :cohort %>
+    <%= form.text_field :cohort %>
+  </div>
+
+  <div class="field">
+    <%= form.label :curriculum %>
+    <%= form.text_field :curriculum %>
+  </div>
+
+  <div class="field">
+    <%= form.label :h_age %>
+    <%= form.text_field :h_age %>
+  </div>
+
+  <div class="field">
+    <%= form.label :h_grade %>
+    <%= form.text_field :h_grade %>
+  </div>
+
+  <div class="field">
+    <%= form.label :m_age %>
+    <%= form.text_field :m_age %>
+  </div>
+
+  <div class="field">
+    <%= form.label :m_grade %>
+    <%= form.text_field :m_grade %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang %>
+    <%= form.text_field :lang %>
+  </div>
+
+  <div class="field">
+    <%= form.label :lang_other_txt %>
+    <%= form.text_field :lang_other_txt %>
+  </div>
+
+  <div class="field">
+    <%= form.label :is_hispanic %>
+    <%= form.text_field :is_hispanic %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race %>
+    <%= form.text_field :race %>
+  </div>
+
+  <div class="field">
+    <%= form.label :race_other_txt %>
+    <%= form.text_field :race_other_txt %>
+  </div>
+
+  <div class="field">
+    <%= form.label :is_male %>
+    <%= form.text_field :is_male %>
+  </div>
+
+  <div class="field">
+    <%= form.label :domestic %>
+    <%= form.text_field :domestic %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_behavior_peer %>
+    <%= form.text_field :impact_behavior_peer %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_behavior_emotion %>
+    <%= form.text_field :impact_behavior_emotion %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_behavior_alcohol %>
+    <%= form.text_field :impact_behavior_alcohol %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_behavior_think %>
+    <%= form.text_field :impact_behavior_think %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_intent_plans %>
+    <%= form.text_field :impact_intent_plans %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_intent_study %>
+    <%= form.text_field :impact_intent_study %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_intent_graduate %>
+    <%= form.text_field :impact_intent_graduate %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_intent_more_study %>
+    <%= form.text_field :impact_intent_more_study %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_intent_work %>
+    <%= form.text_field :impact_intent_work %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_finance_save %>
+    <%= form.text_field :impact_finance_save %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_finance_bank %>
+    <%= form.text_field :impact_finance_bank %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_finance_budget %>
+    <%= form.text_field :impact_finance_budget %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_finance_track %>
+    <%= form.text_field :impact_finance_track %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_finance_cost %>
+    <%= form.text_field :impact_finance_cost %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_talk_parent %>
+    <%= form.text_field :impact_talk_parent %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_talk_other %>
+    <%= form.text_field :impact_talk_other %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_relate_healthy %>
+    <%= form.text_field :impact_relate_healthy %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_relate_resist %>
+    <%= form.text_field :impact_relate_resist %>
+  </div>
+
+  <div class="field">
+    <%= form.label :impact_relate_talk %>
+    <%= form.text_field :impact_relate_talk %>
+  </div>
+
+  <div class="field">
+    <%= form.label :plan_abstainsex %>
+    <%= form.text_field :plan_abstainsex %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_yes_plans %>
+    <%= form.text_field :abstain_yes_plans %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_yes_consequences %>
+    <%= form.text_field :abstain_yes_consequences %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_yes_sti %>
+    <%= form.text_field :abstain_yes_sti %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_yes_preg %>
+    <%= form.text_field :abstain_yes_preg %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_notyes_havesex %>
+    <%= form.text_field :abstain_notyes_havesex %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_notyes_condom %>
+    <%= form.text_field :abstain_notyes_condom %>
+  </div>
+
+  <div class="field">
+    <%= form.label :abstain_notyes_contra %>
+    <%= form.text_field :abstain_notyes_contra %>
+  </div>
+
+  <div class="field">
+    <%= form.label :percep_clear %>
+    <%= form.text_field :percep_clear %>
+  </div>
+
+  <div class="field">
+    <%= form.label :percep_learn %>
+    <%= form.text_field :percep_learn %>
+  </div>
+
+  <div class="field">
+    <%= form.label :percep_ask %>
+    <%= form.text_field :percep_ask %>
+  </div>
+
+  <div class="field">
+    <%= form.label :percep_respect %>
+    <%= form.text_field :percep_respect %>
+  </div>
+
+  <div class="field">
+    <%= form.label :satisfaction_abstain %>
+    <%= form.text_field :satisfaction_abstain %>
+  </div>
+
+  <div class="field">
+    <%= form.label :satisfaction_contra %>
+    <%= form.text_field :satisfaction_contra %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

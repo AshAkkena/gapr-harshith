@@ -1,0 +1,2 @@
+module CohoUpsHelper
+end
